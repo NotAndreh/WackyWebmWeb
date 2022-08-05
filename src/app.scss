@@ -1,0 +1,27 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html,
+body,
+#app {
+    height: 100%;
+}
+
+@layer components {
+    .button {
+        @apply font-semibold px-4 py-1.5 rounded-xl transition-all bg-neutral-800 hover:bg-neutral-700 active:bg-neutral-600 disabled:bg-neutral-800 disabled:cursor-not-allowed disabled:text-neutral-500 disabled:hover:bg-neutral-800 disabled:active:bg-neutral-800;
+    }
+
+    .listbox-button {
+        @apply relative w-40 cursor-pointer rounded-lg bg-neutral-800 py-1.5 pl-3 pr-10 text-left hover:bg-neutral-700 active:bg-neutral-600 transition z-0;
+    }
+
+    .listbox-options {
+        @apply absolute mt-1 max-h-60 w-40 overflow-auto rounded-md bg-neutral-800 py-1 shadow-lg z-50;
+    }
+
+    .listbox-option {
+        @apply relative cursor-pointer transition select-none py-1.5 px-3;
+    }
+}
