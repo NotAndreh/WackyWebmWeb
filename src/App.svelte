@@ -4,6 +4,7 @@
     import { Listbox, ListboxButton, ListboxOption, ListboxOptions, Transition } from "@rgossiaux/svelte-headlessui"
     import Result from './Components/Result.svelte';
     import Options from './Components/Options.svelte';
+    import DragAndDrop from "./Components/DragAndDrop.svelte";
     import Fa from 'svelte-fa'
 
     import { wackyWebm } from "./lib/wackywebm/wackywebm";
@@ -197,4 +198,6 @@
     {#if video}
         <Result video={video} />
     {/if}
+
+    <DragAndDrop on:drop={(e) => {files = e.detail}} />
 </main>
