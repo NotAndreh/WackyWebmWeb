@@ -24,7 +24,7 @@ export class Rotate implements Mode {
 			}
 		}
 
-		this.rotateAngle += info.angle / info.frameRate
+		this.rotateAngle += info.angle / info.frameRate * info.tempo
 		const angle = this.rotateAngle * (Math.PI / 180)
 		const width = Math.floor(Math.max(this.orgWidth, this.orgWidth * Math.abs(Math.cos(angle)) + this.orgHeight * Math.abs(Math.sin(angle)))) + delta
 		const height = Math.floor(Math.max(this.orgHeight, this.orgWidth * Math.abs(Math.sin(angle)) + this.orgHeight * Math.abs(Math.cos(angle)))) + delta
