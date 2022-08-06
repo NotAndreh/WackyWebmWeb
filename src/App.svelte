@@ -22,6 +22,8 @@
     let stage: string = "Not started"
     let progress: number = 0
     let processing: boolean = false
+    let startTime: number
+    let remainingTime: string
 
     let modes: Mode[] = [
         new Bounce(), 
@@ -38,10 +40,17 @@
     let split = 50
     let tempo = 1
 
+    function convertTime(time: number): string {
+        let seconds = Math.floor(time % 60)
+        let minutes = Math.floor(time / 60)
+        return `${minutes}m ${seconds}s`
+    }
+
     async function elaborate() {
         if (!files) return
 
         processing = true
+        startTime = Date.now()
 
         video = await wackyWebm({
             file: files[0],
@@ -51,8 +60,13 @@
             tempo: tempo,
             onProgress: (s, p) => {
                 stage = s
-                if (!isNaN(p))
+                if (!isNaN(p)) {
                     progress = Math.min(100, Math.max(0, p))
+                    let remainingSecods = Math.floor(Math.round((1 - progress) * (Date.now() - startTime) / progress) / 1000)
+                    if (!isNaN(remainingSecods) && isFinite(remainingSecods)) {
+                        remainingTime = convertTime(remainingSecods)
+                    }
+                }
             }
         })
 
@@ -187,9 +201,14 @@
             on:click={elaborate}>
             Elaborate
         </button>
-        <span class="font-semibold">Stage: 
-            <span class="font-normal">{stage}</span>
-        </span>
+        <div class="flex flex-row justify-between items-center">
+            <span class="font-semibold">Stage: 
+                <span class="font-normal">{stage}</span>
+            </span>
+            {#if processing && remainingTime}
+                <span>Remaining time: {remainingTime}</span>
+            {/if}
+        </div>
         <div class="w-full rounded-lg overflow-hidden bg-neutral-800">
             <div class="h-4 bg-sky-500 transition-all" style="width: {(progress * 100).toFixed()}%"></div>
         </div>
