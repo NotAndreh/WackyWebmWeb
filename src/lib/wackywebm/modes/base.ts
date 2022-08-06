@@ -19,7 +19,7 @@ export interface FrameInfo {
 export interface FrameBounds {
     width?: number;
     height?: number;
-    command?: string;
+    command?: string[];
 }
 
 export interface ModeOptions {

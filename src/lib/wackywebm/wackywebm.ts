@@ -110,6 +110,8 @@ export async function wackyWebm(options: WackyWebmOptions) {
                 Math.abs(frameBounds.height - lastHeight) > compressionLevel ||
                 i === toFrame
             ) {
+                let vfCommand: string[] = frameBounds.command ?? ["-vf", `scale=${frameBounds.width}x${frameBounds.height}`];
+                
                 // Convert to webm
                 await ffmpeg.run(
                   "-r", frameRate.toString(),
@@ -119,7 +121,7 @@ export async function wackyWebm(options: WackyWebmOptions) {
                   "-c:v", "vp8",
                   "-b:v", "1M",
                   "-crf", "10",
-                  "-vf", `scale=${frameBounds.width}x${frameBounds.height}`,
+                  ...vfCommand,
                   "-aspect", `${frameBounds.width}:${frameBounds.height}`,
                   "-f", "webm",
                   `${i}.webm`

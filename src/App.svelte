@@ -14,6 +14,7 @@
     import { Sporadic } from './lib/wackywebm/modes/sporadic';
     import { Jumpscare } from './lib/wackywebm/modes/jumpscare';
     import { Keyframes } from './lib/wackywebm/modes/keyframes';
+    import { Rotate } from "./lib/wackywebm/modes/rotate";
     
     let files: FileList
     let video: string
@@ -27,7 +28,8 @@
         new Shutter(), 
         new Sporadic(), 
         new Jumpscare(),
-        new Keyframes()
+        new Keyframes(),
+        new Rotate()
     ]
     let selectedMode: Mode = modes[0]
 

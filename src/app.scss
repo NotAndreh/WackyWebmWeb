@@ -18,7 +18,7 @@ body,
     }
 
     .listbox-options {
-        @apply absolute mt-1 max-h-60 w-40 overflow-auto rounded-md bg-neutral-800 py-1 shadow-lg z-50;
+        @apply absolute mt-1 max-h-80 w-40 overflow-auto rounded-md bg-neutral-800 py-1 shadow-lg z-50;
     }
 
     .listbox-option {
