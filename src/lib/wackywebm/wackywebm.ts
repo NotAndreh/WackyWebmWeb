@@ -1,11 +1,13 @@
 import { createFFmpeg, fetchFile } from "../ffmpeg"
-import type { Mode } from "./modes/base"
+import type { FrameInfo, Mode } from "./modes/base"
 import type { FFmpeg } from "../ffmpeg/createFFmpeg"
 
 export interface WackyWebmOptions {
     file: File
     mode: Mode,
     scale?: number
+    split?: number
+    tempo?: number
     onProgress?: (stage: string, progress: number) => void
 }
 
@@ -14,13 +16,15 @@ export async function wackyWebm(options: WackyWebmOptions) {
         file,
         mode,
         scale = 4,
+        split = 50,
+        tempo = 1,
         onProgress
     } = options
 
     // Lazy load FFprobe
     const FFprobeWasm = await import("ffprobe-wasm")
 
-    let stage = "frames"
+    let stage = "Extract frames"
     let ffprobe = new FFprobeWasm.FFprobeWorker()
     let ffmpeg: FFmpeg
 
@@ -30,32 +34,38 @@ export async function wackyWebm(options: WackyWebmOptions) {
     const frameRate = parseInt(info.streams[0].r_frame_rate.split("/")[0]);
     const frameCount = parseInt(info.streams[0].nb_frames)
 
+    mode.setup({
+        frame: 0,
+        maxWidth: width,
+        maxHeight: height,
+        frameCount: frameCount,
+        frameRate: frameRate,
+        tempo: tempo,
+        angle: 360,
+    })
+
     let parts = []
-    for (let i = 0; i < Math.ceil(frameCount / 50); i++) {
-        let fromFrame = i * 50
-        let toFrame = Math.min((i + 1) * 50 - 1, frameCount)
+    for (let i = 0; i < Math.ceil(frameCount / split); i++) {
+        let fromFrame = i * split
+        let toFrame = Math.min((i + 1) * split - 1, frameCount)
 
         // Setup ffmpeg
         ffmpeg = createFFmpeg({ log: true })
         await ffmpeg.load()
-        ffmpeg.setProgress(x => {
-            if (stage != "webm") {
-                onProgress(stage, x.ratio)
-            }
-        })
         ffmpeg.FS("writeFile", "video.mp4", await fetchFile(file))
 
-        stage = "frames"
+        stage = `Extract frames (Part ${i + 1})`
+        onProgress(stage, fromFrame / frameCount)
         await ffmpeg.run(
             "-i", "video.mp4",
             "-vf", `scale=${width}:${height}, select=between(n\\,${fromFrame}\\,${toFrame})`,
             "%d.png"
         )
 
-        stage = "webm"
+        stage = `Convert to webm (Part ${i + 1})`
         const list = [];
 
-        let currentFrame = 0;
+        //let currentFrame = 0;
         let lastWidth = -1;
         let lastHeight = -1;
         let sameSizeCount = 1;
@@ -64,13 +74,13 @@ export async function wackyWebm(options: WackyWebmOptions) {
         for (let i = fromFrame; i <= toFrame; i++) {
             onProgress(stage, i / frameCount)
     
-            const infoObject = {
+            const infoObject: FrameInfo = {
                 frame: i,
                 maxWidth: width,
                 maxHeight: height,
                 frameCount: frameCount,
                 frameRate: frameRate,
-                tempo: 1, // TODO
+                tempo: tempo,
                 angle: 360, //TODO
             };
     
@@ -118,7 +128,8 @@ export async function wackyWebm(options: WackyWebmOptions) {
             }
         }
 
-        stage = "concat"
+        stage = `Concatenating webms (Part ${i + 1})`
+        onProgress(stage, toFrame / frameCount)
         const listEncoded = new TextEncoder().encode(list.join("\n"))
         ffmpeg.FS("writeFile", "list.txt", listEncoded)
 
@@ -158,7 +169,8 @@ export async function wackyWebm(options: WackyWebmOptions) {
     })
 
     // Extract audio
-    stage = "audio"
+    stage = "Extract audio"
+    onProgress(stage, 1)
     await ffmpeg.run(
         "-i", "video.mp4",
         "-vn",
@@ -167,7 +179,8 @@ export async function wackyWebm(options: WackyWebmOptions) {
     )
     
     // Create file list for ffmpeg
-    stage = "final"
+    stage = "Concatenating webms"
+    onProgress(stage, 1)
     const listEncoded = new TextEncoder().encode(list.join("\n"))
     ffmpeg.FS("writeFile", "list.txt", listEncoded)
 
@@ -181,7 +194,8 @@ export async function wackyWebm(options: WackyWebmOptions) {
         "final.webm"
     )
 
-    stage = "finished"
+    stage = "Finished"
+    onProgress(stage, 1)
     const data = ffmpeg.FS("readFile", "final.webm")
     
     Promise.all([

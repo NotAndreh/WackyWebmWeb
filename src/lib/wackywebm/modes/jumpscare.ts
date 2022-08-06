@@ -1,20 +1,31 @@
-import type { Mode } from "./base";
+import type { FrameBounds, FrameInfo, Mode, ModeOptions } from "./base";
 
-// TODO OPTIONS
+export class Jumpscare implements Mode {
+    name = "Jumpscape"
+    options: ModeOptions = {
+        minimumSizeFrame: {
+            name: "Minimum size frame",
+            type: "number",
+            value: 30
+        },
+        fullSizeFrame: {
+            name: "Full size frame",
+            type: "number",
+            value: 120
+        },
+        minimumSize: {
+            name: "Minimum size",
+            type: "number",
+            value: 5
+        }
+    }
 
-export const Jumpscare: Mode = {
-    name: "Jumpscape",
-    setup: () => {},
-    getFrameBounds: (info) => {
-        // shrink to minimumSize time (in sec)
-        const minimumSizeTime = 1
-        // jump to full size time (in sec)
-        const fullSizeTime = 4
-        // minimum width and height
-        const minimumSize = 10
+    setup() { }
 
-        const minimumSizeFrame = minimumSizeTime * info.frameRate
-        const fullSizeFrame = fullSizeTime * info.frameRate
+    getFrameBounds(info: FrameInfo): FrameBounds {
+        let minimumSizeFrame = this.options.minimumSizeFrame.value as number
+        let fullSizeFrame = this.options.fullSizeFrame.value as number
+        let minimumSize = this.options.minimumSize.value as number
 
         let width: number 
         let height: number
@@ -29,5 +40,5 @@ export const Jumpscare: Mode = {
             width = info.maxWidth
         }
         return { width, height }
-    },
+    }
 }

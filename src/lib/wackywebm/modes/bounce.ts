@@ -1,10 +1,27 @@
-import type { Mode } from "./base";
+import type { FrameBounds, FrameInfo, Mode, ModeOptions } from "./base";
 import { delta } from "../util";
 
-export const Bounce: Mode = {
-    name: "Bounce",
-    setup: () => {},
-    getFrameBounds: (info) => ({
-        height: info.frame === 0 ? info.maxHeight : Math.floor(Math.abs(Math.cos((info.frame / (info.frameRate / info.tempo)) * Math.PI) * (info.maxHeight - delta))) + delta
-    })
+export class Bounce implements Mode {
+    name = "Bounce"
+    options: ModeOptions = {
+        startFrame: {
+            name: "Start Frame",
+            type: "number",
+            value: 0
+        }
+    }
+
+    setup() { }
+
+    getFrameBounds(info: FrameInfo): FrameBounds {
+        let startFrame = this.options.startFrame.value as number
+        
+        let height = info.maxHeight
+
+        if (info.frame > startFrame) {
+            height = info.frame === 0 ? info.maxHeight : Math.floor(Math.abs(Math.cos(((info.frame-startFrame) / (info.frameRate / info.tempo)) * Math.PI) * (info.maxHeight - delta))) + delta
+        }
+        
+        return { height }
+    }
 }

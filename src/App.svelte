@@ -1,8 +1,10 @@
 <script lang="ts">
-    import Fa from 'svelte-fa'
     import { faCheck, faFile, faQuestionCircle, faSort } from "@fortawesome/free-solid-svg-icons"
     import { faGithub } from "@fortawesome/free-brands-svg-icons"
     import { Listbox, ListboxButton, ListboxOption, ListboxOptions, Transition } from "@rgossiaux/svelte-headlessui"
+    import Result from './Components/Result.svelte';
+    import Options from './Components/Options.svelte';
+    import Fa from 'svelte-fa'
 
     import { wackyWebm } from "./lib/wackywebm/wackywebm";
     import type { Mode } from './lib/wackywebm/modes/base';
@@ -11,17 +13,27 @@
     import { Shutter } from './lib/wackywebm/modes/shutter';
     import { Sporadic } from './lib/wackywebm/modes/sporadic';
     import { Jumpscare } from './lib/wackywebm/modes/jumpscare';
-
+    import { Keyframes } from './lib/wackywebm/modes/keyframes';
+    
     let files: FileList
     let video: string
     let stage: string = "init"
     let progress: number = 0
     let processing: boolean = false
 
-    let modes = [Bounce, Shrink, Shutter, Sporadic, Jumpscare]
-    let selectedMode: Mode = Bounce
+    let modes: Mode[] = [
+        new Bounce(), 
+        new Shrink(), 
+        new Shutter(), 
+        new Sporadic(), 
+        new Jumpscare(),
+        new Keyframes()
+    ]
+    let selectedMode: Mode = modes[0]
 
     let scale = 4
+    let split = 50
+    let tempo = 1
 
     async function elaborate() {
         if (!files) return
@@ -32,6 +44,8 @@
             file: files[0],
             mode: selectedMode,
             scale: scale,
+            split: split,
+            tempo: tempo,
             onProgress: (s, p) => {
                 stage = s
                 if (!isNaN(p))
@@ -52,7 +66,7 @@
         </div>
     </header>
 
-    <section class="p-4 flex flex-col gap-2 max-w-[40rem] w-full self-center border border-neutral-800 rounded-xl m-4 shadow-lg">
+    <section class="p-4 flex flex-col gap-2 max-w-[40rem] w-full self-center border border-neutral-800 rounded-xl my-4 shadow-lg">
         <div class="flex flex-row items-center justify-between">
             <span class="font-semibold">Select file:</span>
             <div class="flex flex-row items-center gap-2">
@@ -145,6 +159,24 @@
                 </Transition>
             </Listbox>
         </div>
+
+        <div class="flex flex-row items-center justify-between">
+            <span class="font-semibold">Split frames: </span>
+            <div class="flex flex-row items-center gap-2">
+                <label for="split">{split}</label>
+                <input type="range" class="slider" id="split" min="20" max="200" step="10" bind:value={split}>
+            </div>
+        </div>
+
+        <div class="flex flex-row items-center justify-between">
+            <span class="font-semibold">Tempo: </span>
+            <div class="flex flex-row items-center gap-2">
+                <label for="tempo">{tempo.toFixed(1)}</label>
+                <input type="range" class="slider" id="tempo" min="1" max="8" step="0.1" bind:value={tempo}>
+            </div>
+        </div>
+        
+        <Options mode={selectedMode} />
         
         <button 
             class="button self-end"
@@ -161,17 +193,6 @@
     </section>
 
     {#if video}
-        <Transition
-            show={!!video}
-            enter="transition ease"
-            enterFrom="transform scale-90 opacity-0"
-            enterTo="transform scale-100 opacity-100"
-            as="section"
-            class="p-4 flex flex-col origin-top gap-2 max-w-[40rem] w-full self-center border border-neutral-800 rounded-xl m-4 mt-0 shadow-lg"
-        >
-            <span class="font-semibold">Result:</span>
-            <!-- svelte-ignore a11y-media-has-caption -->
-            <video src={video} controls class="rounded-lg self-start"></video>
-        </Transition>
+        <Result video={video} />
     {/if}
 </main>
