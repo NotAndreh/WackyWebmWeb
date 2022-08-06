@@ -24,16 +24,19 @@ export async function wackyWebm(options: WackyWebmOptions) {
     // Lazy load FFprobe
     const FFprobeWasm = await import("ffprobe-wasm")
 
-    let stage = "Extract frames"
+    // Create FFprobe instance
     let ffprobe = new FFprobeWasm.FFprobeWorker()
     let ffmpeg: FFmpeg
+    let stage = "Extract frames"
 
+    // Fetch file info
     const info = await ffprobe.getFileInfo(file)
     const width = info.streams[0].codec_width / scale
     const height = info.streams[0].codec_height / scale
     const frameRate = parseInt(info.streams[0].r_frame_rate.split("/")[0]);
     const frameCount = parseInt(info.streams[0].nb_frames)
 
+    // Setup the mode
     mode.setup({
         frame: 0,
         maxWidth: width,
@@ -44,16 +47,19 @@ export async function wackyWebm(options: WackyWebmOptions) {
         angle: 360,
     })
 
+    // Split the process into parts, allowing to not go OOM  by recreating the ffmpeg instance :/
     let parts = []
     for (let i = 0; i < Math.ceil(frameCount / split); i++) {
+        // Get initial frame and final frame of the part
         let fromFrame = i * split
         let toFrame = Math.min((i + 1) * split - 1, frameCount)
 
-        // Setup ffmpeg
+        // Setup ffmpeg and load the video
         ffmpeg = createFFmpeg({ log: true })
         await ffmpeg.load()
         ffmpeg.FS("writeFile", "video.mp4", await fetchFile(file))
 
+        // Extract the frames
         stage = `Extract frames (Part ${i + 1})`
         onProgress(stage, fromFrame / frameCount)
         await ffmpeg.run(
@@ -61,8 +67,7 @@ export async function wackyWebm(options: WackyWebmOptions) {
             "-vf", `scale=${width}:${height}, select=between(n\\,${fromFrame}\\,${toFrame})`,
             "%d.png"
         )
-
-        stage = `Convert to webm (Part ${i + 1})`
+        
         const list = [];
 
         //let currentFrame = 0;
@@ -70,7 +75,9 @@ export async function wackyWebm(options: WackyWebmOptions) {
         let lastHeight = -1;
         let sameSizeCount = 1;
         const compressionLevel = 0;
-
+        
+        // Convert the frames into webm and applying the mode
+        stage = `Convert to webm (Part ${i + 1})`
         for (let i = fromFrame; i <= toFrame; i++) {
             onProgress(stage, i / frameCount)
     
@@ -128,12 +135,12 @@ export async function wackyWebm(options: WackyWebmOptions) {
             }
         }
 
+        // Concatenate the generated webms of the part
         stage = `Concatenating webms (Part ${i + 1})`
         onProgress(stage, toFrame / frameCount)
         const listEncoded = new TextEncoder().encode(list.join("\n"))
         ffmpeg.FS("writeFile", "list.txt", listEncoded)
 
-        // Create final webm file
         await ffmpeg.run(
             "-f", "concat",
             "-safe", "0",
@@ -144,6 +151,7 @@ export async function wackyWebm(options: WackyWebmOptions) {
 
         parts.push(ffmpeg.FS("readFile", `part${i}.webm`))
 
+        // Unlink all the files
         Promise.all([
             ffmpeg.FS("unlink", "list.txt"),
             ffmpeg.FS("unlink", "video.mp4"),
@@ -155,9 +163,11 @@ export async function wackyWebm(options: WackyWebmOptions) {
             list.map((string) => ffmpeg.FS("unlink", string.split(" ")[1])),
         ])
 
+        // Exit ffmpeg to clean the memory
         ffmpeg.exit()
     }
 
+    // Create ffmpeg instance for final concatenation
     ffmpeg = createFFmpeg({ log: true })
     await ffmpeg.load()
 
@@ -197,7 +207,8 @@ export async function wackyWebm(options: WackyWebmOptions) {
     stage = "Finished"
     onProgress(stage, 1)
     const data = ffmpeg.FS("readFile", "final.webm")
-    
+
+    // Unlink all the files
     Promise.all([
         ffmpeg.FS("unlink", "list.txt"),
         ffmpeg.FS("unlink", "audio.webm"),
@@ -205,6 +216,7 @@ export async function wackyWebm(options: WackyWebmOptions) {
         list.map((string) => ffmpeg.FS("unlink", string.split(" ")[1])),
     ])
 
+    // Exit ffmpeg and ffprobe
     ffmpeg.exit()
     ffprobe.terminate()
 

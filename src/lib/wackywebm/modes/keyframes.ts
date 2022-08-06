@@ -93,7 +93,6 @@ function infixToPostfix(exp: string) {
 
 
 async function parseKeyFrames(content: string, framerate: number, originalWidth: number, originalHeight: number) {
-	
 	// currently, whitespace except newlines *never* serves a syntactic function, so we can just remove it at the start.
 	const lines = content.split('\n').map(l => l.replace(/\s/g, '')).filter((s) => s !== '' && s[0] !== "#")
 	let data: any = lines.map((l) => l.split(','))
