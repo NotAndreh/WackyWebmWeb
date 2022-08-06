@@ -17,7 +17,7 @@
     
     let files: FileList
     let video: string
-    let stage: string = "init"
+    let stage: string = "Not started"
     let progress: number = 0
     let processing: boolean = false
 
