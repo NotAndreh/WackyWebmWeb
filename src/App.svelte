@@ -194,7 +194,7 @@
             <span class="font-semibold">Tempo: </span>
             <div class="flex flex-row items-center gap-2">
                 <label for="tempo">{tempo.toFixed(1)}</label>
-                <input type="range" class="slider" id="tempo" min="1" max="8" step="0.1" bind:value={tempo}>
+                <input type="range" class="slider" id="tempo" min="0.1" max="8" step="0.1" bind:value={tempo}>
             </div>
         </div>
         
