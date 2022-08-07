@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { faCheck, faFile, faQuestionCircle, faSort } from "@fortawesome/free-solid-svg-icons"
+    import { faCheck, faFile, faSort } from "@fortawesome/free-solid-svg-icons"
     import { faGithub } from "@fortawesome/free-brands-svg-icons"
     import { Listbox, ListboxButton, ListboxOption, ListboxOptions, Transition } from "@rgossiaux/svelte-headlessui"
     import Result from './Components/Result.svelte';
@@ -16,9 +16,8 @@
     import { Jumpscare } from './lib/wackywebm/modes/jumpscare';
     import { Keyframes } from './lib/wackywebm/modes/keyframes';
     import { Rotate } from "./lib/wackywebm/modes/rotate";
-import { getAudioLevelMap } from "./lib/wackywebm/util";
-import { AudioBounce } from "./lib/wackywebm/modes/audiobounce";
-import { AudioShutter } from "./lib/wackywebm/modes/audioshutter";
+    import { AudioBounce } from "./lib/wackywebm/modes/audiobounce";
+    import { AudioShutter } from "./lib/wackywebm/modes/audioshutter";
     
     let files: FileList
     let video: string
