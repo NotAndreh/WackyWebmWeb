@@ -207,8 +207,6 @@ import { AudioShutter } from "./lib/wackywebm/modes/audioshutter";
             Elaborate
         </button>
 
-        <button on:click={() => getAudioLevelMap(files[0])}>Audio level</button>
-
         <div class="flex flex-row justify-between items-center">
             <span class="font-semibold">Stage: 
                 <span class="font-normal">{stage}</span>
