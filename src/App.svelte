@@ -83,8 +83,9 @@ import { AudioShutter } from "./lib/wackywebm/modes/audioshutter";
     <header class="p-4 px-6 flex flex-row justify-between border-b border-neutral-800">
         <h1 class="text-2xl font-bold">WackyWebm <span class="text-lg font-semibold text-gray-200 hover:text-sky-300 transition">Web</span></h1>
         <div class="flex flex-row items-center gap-2">
-            <Fa class="text-gray-200 cursor-pointer" size="lg" icon={faQuestionCircle} />
-            <Fa class="text-gray-200 cursor-pointer" size="lg" icon={faGithub} />
+            <a href="http://github.com/NotAndreh/WackyWebmWeb">
+                <Fa class="text-gray-200 cursor-pointer" size="lg" icon={faGithub} />
+            </a>
         </div>
     </header>
 
