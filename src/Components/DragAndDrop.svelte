@@ -1,9 +1,9 @@
 <script lang="ts">
-    import { createEventDispatcher } from "svelte";
-    import { faFile } from "@fortawesome/free-solid-svg-icons";
-    import Fa from "svelte-fa";
+    import { createEventDispatcher } from "svelte"
+    import { faFile } from "@fortawesome/free-solid-svg-icons"
+    import Fa from "svelte-fa"
 
-    const dispatch = createEventDispatcher();
+    const dispatch = createEventDispatcher()
     
     let drag = false
 

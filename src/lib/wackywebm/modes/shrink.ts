@@ -1,4 +1,4 @@
-import type { FrameBounds, FrameInfo, Mode, ModeOptions } from "./base";
+import type { FrameBounds, FrameInfo, Mode, ModeOptions } from "./base"
 
 export class Shrink implements Mode {
     name = "Shrink"

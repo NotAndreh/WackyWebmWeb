@@ -1,5 +1,5 @@
 <script lang="ts">
-    import type { Mode } from "src/lib/wackywebm/modes/base";
+    import type { Mode } from "src/lib/wackywebm/modes/base"
 
     export let mode: Mode
 </script>

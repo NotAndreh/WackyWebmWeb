@@ -2,22 +2,22 @@
     import { faCheck, faFile, faSort } from "@fortawesome/free-solid-svg-icons"
     import { faGithub } from "@fortawesome/free-brands-svg-icons"
     import { Listbox, ListboxButton, ListboxOption, ListboxOptions, Transition } from "@rgossiaux/svelte-headlessui"
-    import Result from './Components/Result.svelte';
-    import Options from './Components/Options.svelte';
-    import DragAndDrop from "./Components/DragAndDrop.svelte";
+    import Result from './Components/Result.svelte'
+    import Options from './Components/Options.svelte'
+    import DragAndDrop from "./Components/DragAndDrop.svelte"
     import Fa from 'svelte-fa'
 
-    import { wackyWebm } from "./lib/wackywebm/wackywebm";
-    import type { Mode } from './lib/wackywebm/modes/base';
-    import { Bounce } from "./lib/wackywebm/modes/bounce";
-    import { Shrink } from './lib/wackywebm/modes/shrink';
-    import { Shutter } from './lib/wackywebm/modes/shutter';
-    import { Sporadic } from './lib/wackywebm/modes/sporadic';
-    import { Jumpscare } from './lib/wackywebm/modes/jumpscare';
-    import { Keyframes } from './lib/wackywebm/modes/keyframes';
-    import { Rotate } from "./lib/wackywebm/modes/rotate";
-    import { AudioBounce } from "./lib/wackywebm/modes/audiobounce";
-    import { AudioShutter } from "./lib/wackywebm/modes/audioshutter";
+    import { wackyWebm } from "./lib/wackywebm/wackywebm"
+    import type { Mode } from './lib/wackywebm/modes/base'
+    import { Bounce } from "./lib/wackywebm/modes/bounce"
+    import { Shrink } from './lib/wackywebm/modes/shrink'
+    import { Shutter } from './lib/wackywebm/modes/shutter'
+    import { Sporadic } from './lib/wackywebm/modes/sporadic'
+    import { Jumpscare } from './lib/wackywebm/modes/jumpscare'
+    import { Keyframes } from './lib/wackywebm/modes/keyframes'
+    import { Rotate } from "./lib/wackywebm/modes/rotate"
+    import { AudioBounce } from "./lib/wackywebm/modes/audiobounce"
+    import { AudioShutter } from "./lib/wackywebm/modes/audioshutter"
     
     let files: FileList
     let video: string

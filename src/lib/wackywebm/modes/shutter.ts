@@ -1,5 +1,5 @@
-import type { FrameBounds, FrameInfo, Mode, ModeOptions } from "./base";
-import { delta } from "../util";
+import type { FrameBounds, FrameInfo, Mode, ModeOptions } from "./base"
+import { delta } from "../util"
 
 export class Shutter implements Mode {
     name = 'Shutter'

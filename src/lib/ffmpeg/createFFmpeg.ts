@@ -1,36 +1,36 @@
 import { defaultArgs, baseOptions } from "./config"
-import { setLogging, setCustomLogger, log, type ffmpegLog } from "./utils/log";
-import parseProgress from "./utils/parseProgress";
-import parseArgs from "./utils/parseArgs";
+import { setLogging, setCustomLogger, log, type ffmpegLog } from "./utils/log"
+import parseProgress from "./utils/parseProgress"
+import parseArgs from "./utils/parseArgs"
 
-import { defaultOptions, getCreateFFmpegCore } from './browser';
-import type { FS } from "@ffmpeg/ffmpeg";
+import { defaultOptions, getCreateFFmpegCore } from './browser'
+import type { FS } from "@ffmpeg/ffmpeg"
 
-const NO_LOAD = Error('ffmpeg.wasm is not ready, make sure you have completed load().');
+const NO_LOAD = Error('ffmpeg.wasm is not ready, make sure you have completed load().')
 
-type FSMethodNames = { [K in keyof typeof FS]: (typeof FS)[K] extends (...args: any[]) => any ? K : never }[keyof typeof FS];
-type FSMethodArgs = { [K in FSMethodNames]: Parameters<(typeof FS)[K]> };
-type FSMethodReturn = { [K in FSMethodNames]: ReturnType<(typeof FS)[K]> };
+type FSMethodNames = { [K in keyof typeof FS]: (typeof FS)[K] extends (...args: any[]) => any ? K : never }[keyof typeof FS]
+type FSMethodArgs = { [K in FSMethodNames]: Parameters<(typeof FS)[K]> }
+type FSMethodReturn = { [K in FSMethodNames]: ReturnType<(typeof FS)[K]> }
 
-type LogCallback = (logParams: { type: string; message: string }) => any;
-type ProgressCallback = (progressParams: { ratio: number }) => any;
+type LogCallback = (logParams: { type: string; message: string }) => any
+type ProgressCallback = (progressParams: { ratio: number }) => any
 
 export interface CreateFFmpegOptions {
-    corePath?: string;
-    log?: boolean;
-    logger?: LogCallback;
-    progress?: ProgressCallback;
+    corePath?: string
+    log?: boolean
+    logger?: LogCallback
+    progress?: ProgressCallback
 }
 
 export interface FFmpeg {
-    load(): Promise<void>;
-    isLoaded(): boolean;
-    run(...args: string[]): Promise<void>;
-    FS(method: FSMethodNames, ...args: FSMethodArgs[FSMethodNames]): FSMethodReturn[FSMethodNames];
-    setProgress(progress: ProgressCallback): void;
-    setLogger(log: LogCallback): void;
-    setLogging(logging: boolean): void;
-    exit(): void;
+    load(): Promise<void>
+    isLoaded(): boolean
+    run(...args: string[]): Promise<void>
+    FS(method: FSMethodNames, ...args: FSMethodArgs[FSMethodNames]): FSMethodReturn[FSMethodNames]
+    setProgress(progress: ProgressCallback): void
+    setLogger(log: LogCallback): void
+    setLogging(logging: boolean): void
+    exit(): void
 }
 
 export default function (_options: CreateFFmpegOptions = {}): FFmpeg {
@@ -43,26 +43,26 @@ export default function (_options: CreateFFmpegOptions = {}): FFmpeg {
         ...baseOptions,
         ...defaultOptions,
         ..._options,
-    };
+    }
 
-    let Core = null;
-    let ffmpeg = null;
-    let runResolve = null;
-    let runReject = null;
-    let running = false;
-    let progress = optProgress;
+    let Core = null
+    let ffmpeg = null
+    let runResolve = null
+    let runReject = null
+    let running = false
+    let progress = optProgress
     const detectCompletion = (message) => {
         if (message === 'FFMPEG_END' && runResolve !== null) {
-            runResolve();
-            runResolve = null;
-            running = false;
+            runResolve()
+            runResolve = null
+            running = false
         }
-    };
+    }
     const parseMessage = ({ type, message }) => {
-        log(type, message);
-        parseProgress(message, progress);
-        detectCompletion(message);
-    };
+        log(type, message)
+        parseProgress(message, progress)
+        detectCompletion(message)
+    }
 
     /*
      * Load ffmpeg.wasm-core script.
@@ -76,9 +76,9 @@ export default function (_options: CreateFFmpegOptions = {}): FFmpeg {
      *
      */
     const load = async () => {
-        log('info', 'load ffmpeg-core');
+        log('info', 'load ffmpeg-core')
         if (Core === null) {
-            log('info', 'loading ffmpeg-core');
+            log('info', 'loading ffmpeg-core')
             /*
              * In node environment, all paths are undefined as there
              * is no need to set them.
@@ -88,7 +88,7 @@ export default function (_options: CreateFFmpegOptions = {}): FFmpeg {
                 corePath,
                 workerPath,
                 wasmPath,
-            } = await getCreateFFmpegCore(options);
+            } = await getCreateFFmpegCore(options)
             Core = await createFFmpegCore({
                 /*
                  * Assign mainScriptUrlOrBlob fixes chrome extension web worker issue
@@ -106,27 +106,27 @@ export default function (_options: CreateFFmpegOptions = {}): FFmpeg {
                     if (typeof window !== 'undefined') {
                         if (typeof wasmPath !== 'undefined'
                             && path.endsWith('ffmpeg-core.wasm')) {
-                            return wasmPath;
+                            return wasmPath
                         }
                         if (typeof workerPath !== 'undefined'
                             && path.endsWith('ffmpeg-core.worker.js')) {
-                            return workerPath;
+                            return workerPath
                         }
                     }
-                    return prefix + path;
+                    return prefix + path
                 },
-            });
-            ffmpeg = Core.cwrap('proxy_main', 'number', ['number', 'number']);
-            log('info', 'ffmpeg-core loaded');
+            })
+            ffmpeg = Core.cwrap('proxy_main', 'number', ['number', 'number'])
+            log('info', 'ffmpeg-core loaded')
         } else {
-            throw Error('ffmpeg.wasm was loaded, you should not load it again, use ffmpeg.isLoaded() to check next time.');
+            throw Error('ffmpeg.wasm was loaded, you should not load it again, use ffmpeg.isLoaded() to check next time.')
         }
-    };
+    }
 
     /*
      * Determine whether the Core is loaded.
      */
-    const isLoaded = () => Core !== null;
+    const isLoaded = () => Core !== null
 
     /*
      * Run ffmpeg command.
@@ -147,21 +147,21 @@ export default function (_options: CreateFFmpegOptions = {}): FFmpeg {
      *
      */
     const run = (..._args: string[]): Promise<void> => {
-        log('info', `run ffmpeg command: ${_args.join(' ')}`);
+        log('info', `run ffmpeg command: ${_args.join(' ')}`)
         if (Core === null) {
-            throw NO_LOAD;
+            throw NO_LOAD
         } else if (running) {
-            throw Error('ffmpeg.wasm can only run one command at a time');
+            throw Error('ffmpeg.wasm can only run one command at a time')
         } else {
-            running = true;
+            running = true
             return new Promise((resolve, reject) => {
-                const args = [...defaultArgs, ..._args].filter((s) => s.length !== 0);
-                runResolve = resolve;
-                runReject = reject;
-                ffmpeg(...parseArgs(Core, args));
-            });
+                const args = [...defaultArgs, ..._args].filter((s) => s.length !== 0)
+                runResolve = resolve
+                runReject = reject
+                ffmpeg(...parseArgs(Core, args))
+            })
         }
-    };
+    }
 
     /*
      * Run FS operations.
@@ -179,40 +179,40 @@ export default function (_options: CreateFFmpegOptions = {}): FFmpeg {
      *
      */
     const FS = (method: FSMethodNames, ...args: FSMethodArgs[FSMethodNames]): FSMethodReturn[FSMethodNames] => {
-        log('info', `run FS.${method} ${args.map((arg) => (typeof arg === 'string' ? arg : `<${arg.length} bytes binary file>`)).join(' ')}`);
+        log('info', `run FS.${method} ${args.map((arg) => (typeof arg === 'string' ? arg : `<${arg.length} bytes binary file>`)).join(' ')}`)
         if (Core === null) {
-            throw NO_LOAD;
+            throw NO_LOAD
         } else {
-            let ret = null;
+            let ret = null
             try {
-                ret = Core.FS[method](...args);
+                ret = Core.FS[method](...args)
             } catch (e) {
                 // @ts-expect-error
                 if (method === 'readdir') {
-                    throw Error(`ffmpeg.FS('readdir', '${args[0]}') error. Check if the path exists, ex: ffmpeg.FS('readdir', '/')`);
+                    throw Error(`ffmpeg.FS('readdir', '${args[0]}') error. Check if the path exists, ex: ffmpeg.FS('readdir', '/')`)
                 } else if (method === 'readFile') {
-                    throw Error(`ffmpeg.FS('readFile', '${args[0]}') error. Check if the path exists`);
+                    throw Error(`ffmpeg.FS('readFile', '${args[0]}') error. Check if the path exists`)
                 } else {
-                    throw Error('Oops, something went wrong in FS operation.');
+                    throw Error('Oops, something went wrong in FS operation.')
                 }
             }
-            return ret;
+            return ret
         }
-    };
+    }
 
     /**
      * forcibly terminate the ffmpeg program.
      */
     const exit = () => {
         if (Core === null) {
-            throw NO_LOAD;
+            throw NO_LOAD
         } else {
-            running = false;
+            running = false
             try {
-                Core.exit(1);
+                Core.exit(1)
             } catch (err) {
                 if (runReject) {
-                    runReject(err);
+                    runReject(err)
                 }
             } finally {
                 Core = null;
@@ -221,18 +221,18 @@ export default function (_options: CreateFFmpegOptions = {}): FFmpeg {
                 runReject = null;
             }
         }
-    };
+    }
 
     const setProgress = (_progress: ProgressCallback) => {
-        progress = _progress;
-    };
+        progress = _progress
+    }
 
     const setLogger = (_logger: (log: ffmpegLog) => void) => {
-        setCustomLogger(_logger);
-    };
+        setCustomLogger(_logger)
+    }
 
-    setLogging(logging);
-    setCustomLogger(logger);
+    setLogging(logging)
+    setCustomLogger(logger)
 
     return {
         setProgress,
@@ -243,5 +243,5 @@ export default function (_options: CreateFFmpegOptions = {}): FFmpeg {
         run,
         exit,
         FS,
-    };
-};
+    }
+}

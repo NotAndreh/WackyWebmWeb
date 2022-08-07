@@ -7,23 +7,23 @@ export abstract class Mode {
 }
 
 export interface FrameInfo {
-    frame: number;
-    maxWidth: number;
-    maxHeight: number;
-    frameCount: number;
-    frameRate: number;
-    tempo: number;
-    angle: number;
+    frame: number
+    maxWidth: number
+    maxHeight: number
+    frameCount: number
+    frameRate: number
+    tempo: number
+    angle: number
 }
 
 export interface FrameBounds {
-    width?: number;
-    height?: number;
-    command?: string[];
+    width?: number
+    height?: number
+    command?: string[]
 }
 
 export interface ModeOptions {
-    [key: string]: ModeOption;
+    [key: string]: ModeOption
 }
 
 export type ModeOption = {

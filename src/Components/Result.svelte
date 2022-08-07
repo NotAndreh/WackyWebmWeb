@@ -1,7 +1,7 @@
 <script lang="ts">
-    import { Transition } from "@rgossiaux/svelte-headlessui";
+    import { Transition } from "@rgossiaux/svelte-headlessui"
 
-    export let video: string;
+    export let video: string
 </script>
 
 <Transition

@@ -1,6 +1,6 @@
-import defaultOptions from './defaultOptions';
-import getCreateFFmpegCore from './getCreateFFmpegCore';
-import fetchFile from './fetchFile';
+import defaultOptions from './defaultOptions'
+import getCreateFFmpegCore from './getCreateFFmpegCore'
+import fetchFile from './fetchFile'
 
 export { defaultOptions }
 export { getCreateFFmpegCore }

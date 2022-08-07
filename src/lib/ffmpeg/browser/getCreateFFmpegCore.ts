@@ -1,5 +1,5 @@
-import { log } from '../utils/log';
-import { CREATE_FFMPEG_CORE_IS_NOT_DEFINED } from '../utils/errors';
+import { log } from '../utils/log'
+import { CREATE_FFMPEG_CORE_IS_NOT_DEFINED } from '../utils/errors'
 
 /*
  * Fetch data from remote URL and convert to blob URL
@@ -35,34 +35,34 @@ export default async function({ corePath: _corePath }): Promise<any> {
     // @ts-expect-error
     if (typeof createFFmpegCore === 'undefined') {
         return new Promise((resolve) => {
-            const script = document.createElement('script');
+            const script = document.createElement('script')
             const eventHandler = () => {
-                script.removeEventListener('load', eventHandler);
+                script.removeEventListener('load', eventHandler)
                 // @ts-expect-error
                 if (typeof createFFmpegCore === 'undefined') {
-                    throw Error(CREATE_FFMPEG_CORE_IS_NOT_DEFINED(coreRemotePath));
+                    throw Error(CREATE_FFMPEG_CORE_IS_NOT_DEFINED(coreRemotePath))
                 }
-                log('info', 'ffmpeg-core.js script loaded');
+                log('info', 'ffmpeg-core.js script loaded')
                 resolve({
                     // @ts-expect-error
                     createFFmpegCore,
                     corePath,
                     wasmPath,
                     workerPath,
-                });
-            };
-            script.src = corePath;
-            script.type = 'text/javascript';
-            script.addEventListener('load', eventHandler);
-            document.getElementsByTagName('head')[0].appendChild(script);
+                })
+            }
+            script.src = corePath
+            script.type = 'text/javascript'
+            script.addEventListener('load', eventHandler)
+            document.getElementsByTagName('head')[0].appendChild(script)
         });
     }
-    log('info', 'ffmpeg-core.js script is loaded already');
+    log('info', 'ffmpeg-core.js script is loaded already')
     return Promise.resolve({
         // @ts-expect-error
         createFFmpegCore,
         corePath,
         wasmPath,
         workerPath,
-    });
-};
+    })
+}
