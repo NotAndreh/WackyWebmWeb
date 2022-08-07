@@ -35,6 +35,7 @@ export async function wackyWebm(options: WackyWebmOptions) {
     const height = info.streams[0].codec_height / scale
     const frameRate = parseInt(info.streams[0].r_frame_rate.split("/")[0]);
     const frameCount = parseInt(info.streams[0].nb_frames)
+    const bitrate = Math.min(parseInt(info.streams[0].bit_rate), 1000000)
 
     // Setup the mode
     mode.setup({
@@ -119,7 +120,7 @@ export async function wackyWebm(options: WackyWebmOptions) {
                   "-i", "%d.png",
                   "-frames:v", sameSizeCount.toString(),
                   "-c:v", "vp8",
-                  "-b:v", "1M",
+                  "-b:v", bitrate.toString(),
                   "-crf", "10",
                   ...vfCommand,
                   "-aspect", `${frameBounds.width}:${frameBounds.height}`,
