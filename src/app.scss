@@ -19,6 +19,22 @@ body,
 
     .listbox-options {
         @apply absolute mt-1 max-h-80 w-40 overflow-auto rounded-md bg-neutral-800 py-1 shadow-lg z-50;
+
+        &::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        &::-webkit-scrollbar-track {
+            @apply bg-neutral-800; 
+        }
+        
+        &::-webkit-scrollbar-thumb {
+            @apply bg-neutral-700;
+        }
+        
+        &::-webkit-scrollbar-thumb:hover {
+            @apply bg-neutral-600;
+        }
     }
 
     .listbox-option {

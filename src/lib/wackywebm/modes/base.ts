@@ -2,7 +2,7 @@ export abstract class Mode {
     abstract name: string
     abstract options: ModeOptions
 
-    abstract setup(info: FrameInfo): void
+    abstract setup(info: FrameInfo, video: File): void
     abstract getFrameBounds(info: FrameInfo): FrameBounds
 }
 

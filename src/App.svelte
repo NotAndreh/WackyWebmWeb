@@ -16,6 +16,9 @@
     import { Jumpscare } from './lib/wackywebm/modes/jumpscare';
     import { Keyframes } from './lib/wackywebm/modes/keyframes';
     import { Rotate } from "./lib/wackywebm/modes/rotate";
+import { getAudioLevelMap } from "./lib/wackywebm/util";
+import { AudioBounce } from "./lib/wackywebm/modes/audiobounce";
+import { AudioShutter } from "./lib/wackywebm/modes/audioshutter";
     
     let files: FileList
     let video: string
@@ -32,7 +35,9 @@
         new Sporadic(), 
         new Jumpscare(),
         new Keyframes(),
-        new Rotate()
+        new Rotate(),
+        new AudioBounce(),
+        new AudioShutter()
     ]
     let selectedMode: Mode = modes[0]
 
@@ -201,6 +206,9 @@
             on:click={elaborate}>
             Elaborate
         </button>
+
+        <button on:click={() => getAudioLevelMap(files[0])}>Audio level</button>
+
         <div class="flex flex-row justify-between items-center">
             <span class="font-semibold">Stage: 
                 <span class="font-normal">{stage}</span>

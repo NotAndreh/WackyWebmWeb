@@ -45,7 +45,7 @@ export async function wackyWebm(options: WackyWebmOptions) {
         frameRate: frameRate,
         tempo: tempo,
         angle: 360,
-    })
+    }, file)
 
     // Split the process into parts, allowing to not go OOM  by recreating the ffmpeg instance :/
     let parts = []
