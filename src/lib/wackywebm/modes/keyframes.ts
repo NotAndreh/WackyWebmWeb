@@ -1,4 +1,5 @@
 import type { FrameBounds, FrameInfo, Mode, ModeOptions } from "./base"
+import BezierEasing from "bezier-easing"
 
 export class Keyframes implements Mode {
     name = "Keyframes"
@@ -35,6 +36,11 @@ export class Keyframes implements Mode {
                 return {
                     width: lerp(this.keyFrames[this.lastKf].width, this.keyFrames[this.lastKf + 1].width, t),
                     height: lerp(this.keyFrames[this.lastKf].height, this.keyFrames[this.lastKf + 1].height, t),
+                }
+            case 'ease':
+                return {
+                    width: ease(this.keyFrames[this.lastKf].width, this.keyFrames[this.lastKf + 1].width, t),
+                    height: ease(this.keyFrames[this.lastKf].height, this.keyFrames[this.lastKf + 1].height, t),
                 }
         }
     }
@@ -152,4 +158,12 @@ function lerp(a: number, b: number, t: number) {
     a = a + 0.0
     b = b + 0.0
     return Math.floor(a + t * (b - a))
+}
+
+function ease(a: number, b: number, t: number) {
+    // cubic-bezier(.2,0,.35,1)
+    let easing = BezierEasing(.2, 0, .35, 1)
+    a = a + 0.0
+    b = b + 0.0
+    return Math.floor(a + easing(t) * (b - a))
 }

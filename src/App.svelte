@@ -1,7 +1,7 @@
 <script lang="ts">
-    import { faCheck, faFile, faSort } from "@fortawesome/free-solid-svg-icons"
+    import { faCheck, faClose, faSave, faFile, faSort, faEdit } from "@fortawesome/free-solid-svg-icons"
     import { faGithub } from "@fortawesome/free-brands-svg-icons"
-    import { Listbox, ListboxButton, ListboxOption, ListboxOptions, Transition } from "@rgossiaux/svelte-headlessui"
+    import { Dialog, DialogOverlay, Listbox, ListboxButton, ListboxOption, ListboxOptions, Transition, TransitionChild } from "@rgossiaux/svelte-headlessui"
     import Result from './Components/Result.svelte'
     import Options from './Components/Options.svelte'
     import DragAndDrop from "./Components/DragAndDrop.svelte"
@@ -18,6 +18,7 @@
     import { Rotate } from "./lib/wackywebm/modes/rotate"
     import { AudioBounce } from "./lib/wackywebm/modes/audiobounce"
     import { AudioShutter } from "./lib/wackywebm/modes/audioshutter"
+    import KeyframesEditor from "./Components/Editor/KeyframesEditor.svelte";
     
     let files: FileList
     let video: string
@@ -26,6 +27,10 @@
     let processing: boolean = false
     let startTime: number
     let remainingTime: string
+
+    let editor: KeyframesEditor
+    let editorOpen = false
+    $: preview = files && URL.createObjectURL(files[0])
 
     let modes: Mode[] = [
         new Bounce(), 
@@ -38,7 +43,8 @@
         new AudioBounce(),
         new AudioShutter()
     ]
-    let selectedMode: Mode = modes[0]
+    let selectedMode: Mode = modes[5]
+    modes[5].options.content.value = "1,100,100,linear\n2,50,50,linear\n4,120,120,linear"
 
     let scale = 4
     let split = 50
@@ -105,21 +111,22 @@
         <div class="flex flex-row items-center justify-between z-10">
             <span class="font-semibold">Mode: </span>
             <Listbox value={selectedMode} on:change={(e) => (selectedMode = e.detail)}>
-                <ListboxButton class="listbox-button">
-                    <span class="block truncate">{selectedMode.name}</span>
-                    <span class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
-                        <Fa class="h-5 w-5" icon={faSort} />
-                    </span>
-                </ListboxButton>
-                <Transition
-                    enter="transition ease"
-                    enterFrom="transform scale-90 opacity-0"
-                    enterTo="transform scale-100 opacity-100"
-                    leave="transition ease"
-                    leaveFrom="transform scale-100 opacity-100"
-                    leaveTo="transform scale-90 opacity-0"
-                >
-                    <ListboxOptions class="listbox-options" static>
+                <div class="relative">
+                    <ListboxButton class="listbox-button">
+                        <span class="block truncate">{selectedMode.name}</span>
+                        <span class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
+                            <Fa class="h-5 w-5" icon={faSort} />
+                        </span>
+                    </ListboxButton>
+                    <Transition
+                        enter="transition ease"
+                        enterFrom="transform scale-90 opacity-0"
+                        enterTo="transform scale-100 opacity-100"
+                        leave="transition ease"
+                        leaveFrom="transform scale-100 opacity-100"
+                        leaveTo="transform scale-90 opacity-0"
+                    >
+                        <ListboxOptions class="listbox-options" static>
                             {#each modes as mode}
                                 <ListboxOption 
                                 class={({ active }) => `listbox-option ${
@@ -138,47 +145,50 @@
                                 </ListboxOption>
                             {/each}
                         </ListboxOptions>
-                </Transition>
+                    </Transition>
+                </div>
             </Listbox>
         </div>
 
         <div class="flex flex-row items-center justify-between">
             <span class="font-semibold">Scale: </span>
             <Listbox value={scale} on:change={(e) => (scale = e.detail)}>
-                <ListboxButton class="listbox-button">
-                    <span class="block truncate">/{scale}</span>
-                    <span class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
-                        <Fa class="h-5 w-5" icon={faSort} />
-                    </span>
-                </ListboxButton>
-                <Transition
-                    enter="transition ease"
-                    enterFrom="transform scale-90 opacity-0"
-                    enterTo="transform scale-100 opacity-100"
-                    leave="transition ease"
-                    leaveFrom="transform scale-100 opacity-100"
-                    leaveTo="transform scale-90 opacity-0"
-                >
-                    <ListboxOptions class="listbox-options">
-                        {#each Array(4) as _, i}
-                            <ListboxOption 
-                            class={({ active }) => `listbox-option ${
-                                active ? 'bg-neutral-900' : 'text-white'
-                            }`}
-                                value={2**i}
-                                let:selected>
-                                <span class="flex items-center justify-start gap-2">
-                                    {#if selected}
-                                        <Fa class="h-4 w-4" icon={faCheck} />
-                                    {:else}
-                                        <div class="h-4 w-4"></div>
-                                    {/if}
-                                    <span class={selected && "font-semibold"}>/{2**i}</span>
-                                </span>
-                            </ListboxOption>
-                        {/each}
-                    </ListboxOptions>
-                </Transition>
+                <div class="relative">
+                    <ListboxButton class="listbox-button">
+                        <span class="block truncate">/{scale}</span>
+                        <span class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
+                            <Fa class="h-5 w-5" icon={faSort} />
+                        </span>
+                    </ListboxButton>
+                    <Transition
+                        enter="transition ease"
+                        enterFrom="transform scale-90 opacity-0"
+                        enterTo="transform scale-100 opacity-100"
+                        leave="transition ease"
+                        leaveFrom="transform scale-100 opacity-100"
+                        leaveTo="transform scale-90 opacity-0"
+                    >
+                        <ListboxOptions class="listbox-options">
+                            {#each Array(4) as _, i}
+                                <ListboxOption 
+                                class={({ active }) => `listbox-option ${
+                                    active ? 'bg-neutral-900' : 'text-white'
+                                }`}
+                                    value={2**i}
+                                    let:selected>
+                                    <span class="flex items-center justify-start gap-2">
+                                        {#if selected}
+                                            <Fa class="h-4 w-4" icon={faCheck} />
+                                        {:else}
+                                            <div class="h-4 w-4"></div>
+                                        {/if}
+                                        <span class={selected && "font-semibold"}>/{2**i}</span>
+                                    </span>
+                                </ListboxOption>
+                            {/each}
+                        </ListboxOptions>
+                    </Transition>
+                </div>
             </Listbox>
         </div>
 
@@ -198,7 +208,7 @@
             </div>
         </div>
         
-        <Options mode={selectedMode} />
+        <Options mode={selectedMode} preview={!preview} on:click={() => editorOpen = true} />
         
         <button 
             class="button self-end"
@@ -221,8 +231,58 @@
     </section>
 
     {#if video}
-        <Result video={video} />
+        <Result bind:video />
     {/if}
 
-    <DragAndDrop on:drop={(e) => {files = e.detail}} />
+    {#if selectedMode.name === "Keyframes" && preview}
+        <Transition show={editorOpen}>
+            <Dialog as="div" class="fixed inset-0 z-50" open={editorOpen} on:close={() => editorOpen = false}>
+                <TransitionChild
+                    enter="transition ease"
+                    enterFrom="opacity-0"
+                    enterTo="opacity-100"
+                    leave="transition ease"
+                    leaveFrom="opacity-100"
+                    leaveTo="opacity-0"
+                >
+                    <DialogOverlay class="dialog-overlay" />
+                </TransitionChild>
+                
+                <div class="fixed inset-0 flex items-center justify-center p-4" on:mousedown={(e) => {
+                    if (e.target === e.currentTarget) editorOpen = false
+                }}>
+                    <TransitionChild
+                        enter="transition ease"
+                        enterFrom="transform scale-90 opacity-0"
+                        enterTo="transform scale-100 opacity-100"
+                        leave="transition ease"
+                        leaveFrom="transform scale-100 opacity-100"
+                        leaveTo="transform scale-90 opacity-0"
+                    >
+                        <div class="p-4 bg-neutral-900 max-w-[60rem] w-full rounded-lg text-white">
+                            <div class="flex justify-between mb-3">
+                                <span class="font-semibold">Keyframes Editor</span>
+                                <div class="flex gap-2">
+                                    <button on:click={() => editorOpen = false} class="button flex flex-row items-center gap-2 h-6 text-sm px-2 rounded-md">
+                                        <Fa icon={faClose} />
+                                        Close
+                                    </button>
+                                    <button on:click={() => {
+                                        editorOpen = false
+                                        selectedMode.options.content.value = editor.save()
+                                    }} class="button flex flex-row items-center gap-2 h-6 text-sm px-2 rounded-md">
+                                        <Fa icon={faSave} />
+                                        Save
+                                    </button>
+                                </div>
+                            </div>
+                            <KeyframesEditor bind:this={editor} bind:preview keyframesString={selectedMode.options.content.value} />
+                        </div>
+                    </TransitionChild>
+                </div>
+            </Dialog>
+        </Transition>
+    {/if}
+
+    <!-- <DragAndDrop on:drop={(e) => {files = e.detail}} /> -->
 </main>

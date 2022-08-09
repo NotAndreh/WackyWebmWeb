@@ -4,13 +4,19 @@ import parseProgress from "./utils/parseProgress"
 import parseArgs from "./utils/parseArgs"
 
 import { defaultOptions, getCreateFFmpegCore } from './browser'
-import type { FS } from "@ffmpeg/ffmpeg"
 
 const NO_LOAD = Error('ffmpeg.wasm is not ready, make sure you have completed load().')
 
-type FSMethodNames = { [K in keyof typeof FS]: (typeof FS)[K] extends (...args: any[]) => any ? K : never }[keyof typeof FS]
-type FSMethodArgs = { [K in FSMethodNames]: Parameters<(typeof FS)[K]> }
-type FSMethodReturn = { [K in FSMethodNames]: ReturnType<(typeof FS)[K]> }
+type FS = {
+    writeFile: (fileName: string, binaryData: Uint8Array) => void,
+    readFile: (fileName: string) => Uint8Array,
+    unlink: (fileName: string) => void,
+    readdir: (dirName: string) => string[],
+}
+
+type FSMethodNames = { [K in keyof FS]: (FS)[K] extends (...args: any[]) => any ? K : never }[keyof FS]
+type FSMethodArgs = { [K in FSMethodNames]: Parameters<(FS)[K]> }
+type FSMethodReturn = { [K in FSMethodNames]: ReturnType<(FS)[K]> }
 
 type LogCallback = (logParams: { type: string; message: string }) => any
 type ProgressCallback = (progressParams: { ratio: number }) => any
@@ -26,7 +32,7 @@ export interface FFmpeg {
     load(): Promise<void>
     isLoaded(): boolean
     run(...args: string[]): Promise<void>
-    FS(method: FSMethodNames, ...args: FSMethodArgs[FSMethodNames]): FSMethodReturn[FSMethodNames]
+    FS<Method extends FSMethodNames>(method: Method, ...args: FSMethodArgs[Method]): FSMethodReturn[Method]
     setProgress(progress: ProgressCallback): void
     setLogger(log: LogCallback): void
     setLogging(logging: boolean): void
@@ -178,7 +184,7 @@ export default function (_options: CreateFFmpegOptions = {}): FFmpeg {
      * For more info, check https://emscripten.org/docs/api_reference/Filesystem-API.html
      *
      */
-    const FS = (method: FSMethodNames, ...args: FSMethodArgs[FSMethodNames]): FSMethodReturn[FSMethodNames] => {
+    const FS = (method: any, ...args: any): any => {
         log('info', `run FS.${method} ${args.map((arg) => (typeof arg === 'string' ? arg : `<${arg.length} bytes binary file>`)).join(' ')}`)
         if (Core === null) {
             throw NO_LOAD
@@ -187,7 +193,6 @@ export default function (_options: CreateFFmpegOptions = {}): FFmpeg {
             try {
                 ret = Core.FS[method](...args)
             } catch (e) {
-                // @ts-expect-error
                 if (method === 'readdir') {
                     throw Error(`ffmpeg.FS('readdir', '${args[0]}') error. Check if the path exists, ex: ffmpeg.FS('readdir', '/')`)
                 } else if (method === 'readFile') {

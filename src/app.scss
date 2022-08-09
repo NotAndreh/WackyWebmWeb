@@ -14,7 +14,7 @@ body,
     }
 
     .listbox-button {
-        @apply relative w-40 cursor-pointer rounded-lg bg-neutral-800 py-1.5 pl-3 pr-10 text-left hover:bg-neutral-700 active:bg-neutral-600 transition z-0;
+        @apply w-40 cursor-pointer rounded-lg bg-neutral-800 py-1.5 pl-3 pr-10 text-left hover:bg-neutral-700 active:bg-neutral-600 transition z-0;
     }
 
     .listbox-options {
@@ -35,11 +35,23 @@ body,
     }
 
     .listbox-option {
-        @apply relative cursor-pointer transition select-none py-1.5 px-3;
+        @apply cursor-pointer transition select-none py-1.5 px-3;
     }
 
     .input-text {
-        @apply appearance-none bg-neutral-800 rounded-lg px-3 py-1.5 w-40 transition focus:outline-none hover:bg-neutral-700 active:bg-neutral-600;
+        @apply appearance-none bg-neutral-800 rounded-lg px-3 py-1.5 max-w-[10rem] transition focus:outline-none hover:bg-neutral-700 active:bg-neutral-600;
+
+        &::-webkit-scrollbar {
+            @apply w-2;
+        }
+        
+        &::-webkit-scrollbar-thumb {
+            @apply bg-neutral-700 rounded-full;
+        }
+        
+        &::-webkit-scrollbar-thumb:hover {
+            @apply bg-neutral-600;
+        }
     }
 
     .toggle {
@@ -56,5 +68,13 @@ body,
         &::-moz-range-thumb {
             @apply appearance-none h-4 w-4 rounded-full bg-sky-700 cursor-pointer transition hover:bg-sky-600 active:bg-sky-500 border-0;
         }
+    }
+
+    .icon-button {
+        @apply w-8 h-8 inline-flex items-center justify-center rounded-lg bg-transparent hover:bg-neutral-800 active:bg-neutral-700 disabled:text-neutral-500 disabled:hover:bg-transparent disabled:active:bg-transparent transition text-white;
+    }
+
+    .dialog-overlay {
+        @apply fixed inset-0 bg-black opacity-30
     }
 }
