@@ -172,7 +172,9 @@
             style="left: calc({currentTime / duration * 100}% - 2px)" />
         {#if video}
             {#each keyframes as keyframe}
-                <div class="absolute w-0.5 h-4 bg-sky-400 pointer-events-none" style="left: {keyframe.time / duration * 100}%"></div>
+                <div 
+                    class="absolute w-1.5 h-4 bg-sky-400 pointer-events-none" 
+                    style="clip-path: polygon(50% 20%, 100% 50%, 50% 80%, 0% 50%); left: calc({keyframe.time / duration * 100}% - 3px)" />
             {/each}
         {/if}
     </div>
