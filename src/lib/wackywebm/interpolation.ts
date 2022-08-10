@@ -12,3 +12,7 @@ export const ease: Interpolation = (a, b, t) => {
     let easing = bezier(.2, 0, .35, 1)
     return Math.floor(a + easing(t) * (b - a))
 }
+
+export const instant: Interpolation = (a, b, t) => {
+    return t == 1 ? b : a
+}

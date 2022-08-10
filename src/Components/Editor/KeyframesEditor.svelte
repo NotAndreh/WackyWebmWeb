@@ -1,6 +1,6 @@
 <script lang="ts">
     import { faBookmark, faPause, faPlay, faXmark } from "@fortawesome/free-solid-svg-icons"
-    import { ease, linear } from "../../lib/wackywebm/interpolation";
+    import { ease, instant, linear } from "../../lib/wackywebm/interpolation";
     import type { Keyframe } from "./types";
     import PropertyEditor from "./PropertyEditor.svelte"
     import ResizeBox from "./ResizeBox.svelte"
@@ -64,6 +64,10 @@
                         resBoxWidth = clientWidth / video.videoWidth * ease(leftKf.width, rightKf.width, t)
                         resBoxHeight = clientHeight / video.videoHeight * ease(leftKf.height, rightKf.height, t)
                         break
+                    case 'instant':
+                        resBoxWidth = clientWidth / video.videoWidth * instant(leftKf.width, rightKf.width, t)
+                        resBoxHeight = clientHeight / video.videoHeight * instant(leftKf.height, rightKf.height, t)
+                        break
                 }    
             }
         } else keyframe = null
@@ -98,7 +102,7 @@
 
     function addKeyframe() {
         keyframes.push({
-            time: currentTime,
+            time: Math.floor(currentTime * 100) / 100,
             width: video.videoWidth,
             height: video.videoHeight,
             interpolation: "linear"

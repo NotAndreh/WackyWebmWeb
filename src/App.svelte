@@ -2,6 +2,8 @@
     import { faCheck, faClose, faSave, faFile, faSort } from "@fortawesome/free-solid-svg-icons"
     import { faGithub } from "@fortawesome/free-brands-svg-icons"
     import { Dialog, DialogOverlay, Listbox, ListboxButton, ListboxOption, ListboxOptions, Transition, TransitionChild } from "@rgossiaux/svelte-headlessui"
+    import KeyframesEditor from "./Components/Editor/KeyframesEditor.svelte";
+    import DragAndDrop from "./Components/DragAndDrop.svelte";
     import Result from './Components/Result.svelte'
     import Options from './Components/Options.svelte'
     import Fa from 'svelte-fa'
@@ -17,8 +19,6 @@
     import { Rotate } from "./lib/wackywebm/modes/rotate"
     import { AudioBounce } from "./lib/wackywebm/modes/audiobounce"
     import { AudioShutter } from "./lib/wackywebm/modes/audioshutter"
-    import KeyframesEditor from "./Components/Editor/KeyframesEditor.svelte";
-import DragAndDrop from "./Components/DragAndDrop.svelte";
     
     let files: FileList
     let video: string
@@ -30,7 +30,6 @@ import DragAndDrop from "./Components/DragAndDrop.svelte";
 
     let editor: KeyframesEditor
     let editorOpen = false
-    //let preview: string | null = null
     $: preview = files && files[0] ? URL.createObjectURL(files[0]) : null
 
     let modes: Mode[] = [
@@ -71,10 +70,10 @@ import DragAndDrop from "./Components/DragAndDrop.svelte";
             tempo: tempo,
             onProgress: (s, p) => {
                 stage = s
-                if (!isNaN(p)) {
+                if (isFinite(p)) {
                     progress = Math.min(100, Math.max(0, p))
                     let remainingSecods = Math.floor(Math.round((1 - progress) * (Date.now() - startTime) / progress) / 1000)
-                    if (!isNaN(remainingSecods) && isFinite(remainingSecods)) {
+                    if (isFinite(remainingSecods)) {
                         remainingTime = convertTime(remainingSecods)
                     }
                 }
@@ -83,14 +82,6 @@ import DragAndDrop from "./Components/DragAndDrop.svelte";
 
         processing = false
     }
-
-    let options = {
-        scale: 4
-    }
-
-
-
-
 </script>
 
 <main class="h-full bg-neutral-900 text-white flex flex-col overflow-auto">

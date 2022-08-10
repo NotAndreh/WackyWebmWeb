@@ -38,7 +38,7 @@ export async function wackyWebm(options: WackyWebmOptions) {
     const bitrate = Math.min(parseInt(info.streams[0].bit_rate), 1000000)
 
     // Setup the mode
-    mode.setup({
+    await mode.setup({
         frame: 0,
         maxWidth: width,
         maxHeight: height,

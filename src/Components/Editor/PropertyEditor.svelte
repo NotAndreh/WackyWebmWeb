@@ -69,6 +69,21 @@
                                 <span class={selected && "font-semibold"}>ease</span>
                             </span>
                         </ListboxOption>
+                        <ListboxOption 
+                            class={({ active }) => `listbox-option ${
+                                active ? 'bg-neutral-900' : 'text-white'
+                            }`}
+                            value="instant"
+                            let:selected>
+                            <span class="flex items-center justify-start gap-2">
+                                {#if selected}
+                                    <Fa class="h-4 w-4" icon={faCheck} />
+                                {:else}
+                                    <div class="h-4 w-4"></div>
+                                {/if}
+                                <span class={selected && "font-semibold"}>instant</span>
+                            </span>
+                        </ListboxOption>
                     </ListboxOptions>
                 </Transition>
             </div>
