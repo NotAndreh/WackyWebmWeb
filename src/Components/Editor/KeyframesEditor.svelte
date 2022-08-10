@@ -80,7 +80,7 @@
         .map(s => {
         let data = s.split(",")
         return {
-            time: parseInt(data[0]),
+            time: parseFloat(data[0]),
             width: parseInt(data[1]),
             height: parseInt(data[2]),
             interpolation: data[3] ?? "linear"

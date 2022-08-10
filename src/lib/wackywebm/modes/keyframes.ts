@@ -31,7 +31,7 @@ export class Keyframes implements Mode {
             }
 
         const t = (info.frame - this.keyFrames[this.lastKf].time) / (this.keyFrames[this.lastKf + 1].time - this.keyFrames[this.lastKf].time)
-        switch (this.keyFrames[this.lastKf].interpolation.toLowerCase()) {
+        switch (this.keyFrames[this.lastKf+1].interpolation.toLowerCase()) {
             case 'linear':
                 return {
                     width: linear(this.keyFrames[this.lastKf].width, this.keyFrames[this.lastKf + 1].width, t),
@@ -113,9 +113,9 @@ async function parseKeyFrames(content: string, framerate: number, originalWidth:
     const lines = content.split('\n').map(l => l.replace(/\s/g, '')).filter((s) => s !== '' && s[0] !== "#")
     let data: any = lines.map((l) => l.split(','))
     data = data.map((line) => {
-        let time = line[0].split(/[:.-]/)
+        let time = line[0].split(/[:-]/)
         // if there's only 1 "section" to the time, treat it as seconds. if there are 2, treat it as seconds:frames
-        let parsedTime = Math.floor(parseInt(time[0]) * framerate) + (time.length === 1 ? 0 : parseInt(time[1]))
+        let parsedTime = parseFloat(time[0]) * framerate + (time.length === 1 ? 0 : parseInt(time[1]))
 
         const width = infixToPostfix(line[1])
         const height = infixToPostfix(line[2])
