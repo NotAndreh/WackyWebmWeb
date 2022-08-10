@@ -3,6 +3,7 @@
 
     export let width: number
     export let height: number
+    export let active: boolean = false
     let resizing = "none"
     let div: HTMLDivElement
 
@@ -12,6 +13,7 @@
     }>()
 
     function onMouseMove(e: MouseEvent) {
+        if (!active) return
         if (resizing == "width") {
             dispatch("changewidth", e.clientX - div.getBoundingClientRect().left)
         } else if (resizing == "height") {
@@ -22,11 +24,11 @@
 
 <div
     bind:this={div}
-    class="absolute top-0 left-0 outline-dashed outline-4 outline-sky-500 rounded-lg crop" 
-    style="width: {width}px; height: {height}px"
+    class="absolute top-0 left-0 outline-dashed outline-4 outline-sky-500 rounded-lg crop"
+    style="width: {width}px; height: {height}px; {!active && "outline-color: white"}"
 >
-    <div on:mousedown={() => resizing = "width"} class="crop-line crop-right"></div>
-    <div on:mousedown={() => resizing = "height"} class="crop-line crop-bottom"></div>
+    <div on:mousedown={() => resizing = "width"} class="crop-line crop-right" class:active></div>
+    <div on:mousedown={() => resizing = "height"} class="crop-line crop-bottom" class:active></div>
 </div>
 
 <svelte:window 
@@ -52,5 +54,8 @@
         bottom: 0;
         width: 5px;
         cursor: e-resize;
+    }
+    .crop .crop-line:not(.active) {
+        cursor: default;
     }
 </style>

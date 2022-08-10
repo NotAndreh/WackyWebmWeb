@@ -1,5 +1,6 @@
 <script lang="ts">
     import { faBookmark, faPause, faPlay, faXmark } from "@fortawesome/free-solid-svg-icons"
+    import { ease, linear } from "../../lib/wackywebm/interpolation";
     import type { Keyframe } from "./types";
     import PropertyEditor from "./PropertyEditor.svelte"
     import ResizeBox from "./ResizeBox.svelte"
@@ -14,13 +15,57 @@
     let clientHeight: number
     let currentTime: number = 0
     let keyframe: Keyframe | null
+    let leftKf: Keyframe | null
+    let rightKf: Keyframe | null
+
+    let resBoxWidth: number
+    let resBoxHeight: number
 
     $: formattedTime = formatTime(currentTime)
     $: formattedDuration = formatTime(duration)
     $: {
-        if (keyframes.length) {
+        if (keyframes.length && video) {
+            leftKf = keyframes[0]
+            rightKf = keyframes[keyframes.length - 1]
+            for (let i = 0; i < keyframes.length; i++) {
+                if (keyframes[i].time > currentTime) {
+                    rightKf = keyframes[i]
+                    break
+                }
+                leftKf = keyframes[i]
+            }
+            if (leftKf.time > currentTime) leftKf = {
+                time: 0,
+                width: video.videoWidth,
+                height: video.videoHeight,
+                interpolation: "linear"
+            }
+            if (rightKf.time < currentTime) rightKf = {
+                time: duration,
+                width: leftKf.width,
+                height: leftKf.height,
+                interpolation: "linear"
+            }
+
             let closest = keyframes.reduce((prev, curr) => Math.abs(curr.time - currentTime) < Math.abs(prev.time - currentTime) ? curr : prev)
-            keyframe = Math.abs(closest.time - currentTime) < 0.1 ? closest : null 
+            keyframe = Math.abs(closest.time - currentTime) < 0.05 ? closest : null
+            
+            if (keyframe) {
+                resBoxWidth = clientWidth / video.videoWidth * keyframe.width
+                resBoxHeight = clientHeight / video.videoHeight * keyframe.height
+            } else {
+                let t = (currentTime - leftKf.time) / (rightKf.time - leftKf.time)
+                switch (rightKf.interpolation) {
+                    case 'linear':
+                        resBoxWidth = clientWidth / video.videoWidth * linear(leftKf.width, rightKf.width, t)
+                        resBoxHeight = clientHeight / video.videoHeight * linear(leftKf.height, rightKf.height, t)
+                        break
+                    case 'ease':
+                        resBoxWidth = clientWidth / video.videoWidth * ease(leftKf.width, rightKf.width, t)
+                        resBoxHeight = clientHeight / video.videoHeight * ease(leftKf.height, rightKf.height, t)
+                        break
+                }    
+            }
         } else keyframe = null
     }
     
@@ -41,7 +86,7 @@
 
     function onMouseMove(e: MouseEvent) {
         if (e.buttons === 1) {
-            currentTime = e.offsetX / clientWidth * duration
+            currentTime = e.offsetX / (e.target as any).clientWidth * duration
         }
     }
 
@@ -76,17 +121,17 @@
 </script>
 
 <section class="flex flex-col gap-2">
-    <div class="relative" bind:clientWidth bind:clientHeight>
-        <!-- svelte-ignore a11y-media-has-caption -->
-        <video 
-            bind:paused 
-            bind:currentTime
-            bind:this={video}
-            bind:duration
-            src={preview} 
-            class="rounded-lg self-center w-full max-h-[44rem]" />
-
-        {#if keyframe}
+    <div class="min-w-[46rem] max-h-[30rem] flex">
+        <div class="relative mx-auto" bind:clientWidth bind:clientHeight>
+            <!-- svelte-ignore a11y-media-has-caption -->
+            <video 
+                bind:paused 
+                bind:currentTime
+                bind:this={video}
+                bind:duration
+                src={preview} 
+                class="rounded-lg self-center w-full min-h-[20rem]" />
+                
             <ResizeBox
                 on:changewidth={(w) => {
                     keyframe.width = Math.floor(Math.min(video.videoWidth, Math.max(1, (video.videoWidth / clientWidth * w.detail))))
@@ -94,9 +139,10 @@
                 on:changeheight={(h) => {
                     keyframe.height = Math.floor(Math.min(video.videoHeight, Math.max(1, (video.videoHeight / clientHeight * h.detail))))
                 }}
-                width={clientWidth / video.videoWidth * keyframe.width}
-                height={clientHeight / video.videoHeight * keyframe.height} />
-        {/if}
+                active={keyframe !== null}
+                width={resBoxWidth}
+                height={resBoxHeight} />
+        </div>
     </div>
     
     <div class="flex justify-between items-center">

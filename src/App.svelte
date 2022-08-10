@@ -1,10 +1,9 @@
 <script lang="ts">
-    import { faCheck, faClose, faSave, faFile, faSort, faEdit } from "@fortawesome/free-solid-svg-icons"
+    import { faCheck, faClose, faSave, faFile, faSort } from "@fortawesome/free-solid-svg-icons"
     import { faGithub } from "@fortawesome/free-brands-svg-icons"
     import { Dialog, DialogOverlay, Listbox, ListboxButton, ListboxOption, ListboxOptions, Transition, TransitionChild } from "@rgossiaux/svelte-headlessui"
     import Result from './Components/Result.svelte'
     import Options from './Components/Options.svelte'
-    import DragAndDrop from "./Components/DragAndDrop.svelte"
     import Fa from 'svelte-fa'
 
     import { wackyWebm } from "./lib/wackywebm/wackywebm"
@@ -19,6 +18,7 @@
     import { AudioBounce } from "./lib/wackywebm/modes/audiobounce"
     import { AudioShutter } from "./lib/wackywebm/modes/audioshutter"
     import KeyframesEditor from "./Components/Editor/KeyframesEditor.svelte";
+import DragAndDrop from "./Components/DragAndDrop.svelte";
     
     let files: FileList
     let video: string
@@ -30,7 +30,8 @@
 
     let editor: KeyframesEditor
     let editorOpen = false
-    $: preview = files && URL.createObjectURL(files[0])
+    //let preview: string | null = null
+    $: preview = files && files[0] ? URL.createObjectURL(files[0]) : null
 
     let modes: Mode[] = [
         new Bounce(), 
@@ -82,6 +83,14 @@
 
         processing = false
     }
+
+    let options = {
+        scale: 4
+    }
+
+
+
+
 </script>
 
 <main class="h-full bg-neutral-900 text-white flex flex-col overflow-auto">
@@ -110,7 +119,7 @@
 
         <div class="flex flex-row items-center justify-between z-10">
             <span class="font-semibold">Mode: </span>
-            <Listbox value={selectedMode} on:change={(e) => (selectedMode = e.detail)}>
+            <Listbox value={selectedMode}>
                 <div class="relative">
                     <ListboxButton class="listbox-button">
                         <span class="block truncate">{selectedMode.name}</span>
@@ -129,10 +138,11 @@
                         <ListboxOptions class="listbox-options" static>
                             {#each modes as mode}
                                 <ListboxOption 
-                                class={({ active }) => `listbox-option ${
-                                    active ? 'bg-neutral-900' : 'text-white'
-                                }`}
+                                    class={({ active }) => `listbox-option ${
+                                        active ? 'bg-neutral-900' : 'text-white'
+                                    }`}
                                     value={mode}
+                                    on:click={() => (selectedMode = mode)}
                                     let:selected>
                                     <span class="flex items-center justify-start gap-2">
                                         {#if selected}
@@ -151,8 +161,8 @@
         </div>
 
         <div class="flex flex-row items-center justify-between">
-            <span class="font-semibold">Scale: </span>
-            <Listbox value={scale} on:change={(e) => (scale = e.detail)}>
+            <span class="font-semibold">Scale:</span>
+            <Listbox value={scale}>
                 <div class="relative">
                     <ListboxButton class="listbox-button">
                         <span class="block truncate">/{scale}</span>
@@ -171,11 +181,12 @@
                         <ListboxOptions class="listbox-options">
                             {#each Array(4) as _, i}
                                 <ListboxOption 
-                                class={({ active }) => `listbox-option ${
-                                    active ? 'bg-neutral-900' : 'text-white'
-                                }`}
+                                    class={({ active }) => `listbox-option ${
+                                        active ? 'bg-neutral-900' : 'text-white'
+                                    }`}
                                     value={2**i}
-                                    let:selected>
+                                    on:click={() => scale = 2**i} 
+                                    let:selected> <!-- Weird bug idk -->
                                     <span class="flex items-center justify-start gap-2">
                                         {#if selected}
                                             <Fa class="h-4 w-4" icon={faCheck} />
@@ -248,7 +259,7 @@
                     <DialogOverlay class="dialog-overlay" />
                 </TransitionChild>
                 
-                <div class="fixed inset-0 flex items-center justify-center p-4" on:mousedown={(e) => {
+                <div class="fixed p-4 inset-0 flex items-start justify-center overflow-auto" on:mousedown={(e) => {
                     if (e.target === e.currentTarget) editorOpen = false
                 }}>
                     <TransitionChild
@@ -259,7 +270,7 @@
                         leaveFrom="transform scale-100 opacity-100"
                         leaveTo="transform scale-90 opacity-0"
                     >
-                        <div class="p-4 bg-neutral-900 max-w-[60rem] w-full rounded-lg text-white">
+                        <div class="p-4 bg-neutral-900 max-w-[48rem] w-full rounded-lg text-white">
                             <div class="flex justify-between mb-3">
                                 <span class="font-semibold">Keyframes Editor</span>
                                 <div class="flex gap-2">
@@ -284,5 +295,7 @@
         </Transition>
     {/if}
 
-    <!-- <DragAndDrop on:drop={(e) => {files = e.detail}} /> -->
+    {#if !editorOpen}
+        <DragAndDrop on:drop={(e) => {files = e.detail}} />
+    {/if}
 </main>

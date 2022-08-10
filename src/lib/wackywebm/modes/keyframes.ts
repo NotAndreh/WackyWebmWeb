@@ -1,5 +1,5 @@
 import type { FrameBounds, FrameInfo, Mode, ModeOptions } from "./base"
-import BezierEasing from "bezier-easing"
+import { ease, linear } from "../interpolation"
 
 export class Keyframes implements Mode {
     name = "Keyframes"
@@ -34,8 +34,8 @@ export class Keyframes implements Mode {
         switch (this.keyFrames[this.lastKf].interpolation.toLowerCase()) {
             case 'linear':
                 return {
-                    width: lerp(this.keyFrames[this.lastKf].width, this.keyFrames[this.lastKf + 1].width, t),
-                    height: lerp(this.keyFrames[this.lastKf].height, this.keyFrames[this.lastKf + 1].height, t),
+                    width: linear(this.keyFrames[this.lastKf].width, this.keyFrames[this.lastKf + 1].width, t),
+                    height: linear(this.keyFrames[this.lastKf].height, this.keyFrames[this.lastKf + 1].height, t),
                 }
             case 'ease':
                 return {
@@ -150,20 +150,4 @@ async function parseKeyFrames(content: string, framerate: number, originalWidth:
     }
 
     return data
-}
-
-// various kinds of interpolation go here.
-function lerp(a: number, b: number, t: number) {
-    // convert the inputs to floats for accuracy, then convert the result back to an integer at the end
-    a = a + 0.0
-    b = b + 0.0
-    return Math.floor(a + t * (b - a))
-}
-
-function ease(a: number, b: number, t: number) {
-    // cubic-bezier(.2,0,.35,1)
-    let easing = BezierEasing(.2, 0, .35, 1)
-    a = a + 0.0
-    b = b + 0.0
-    return Math.floor(a + easing(t) * (b - a))
 }
