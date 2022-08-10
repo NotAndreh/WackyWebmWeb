@@ -14,7 +14,7 @@ body,
     }
 
     .listbox-button {
-        @apply w-40 cursor-pointer rounded-lg bg-neutral-800 py-1.5 pl-3 pr-10 text-left hover:bg-neutral-700 active:bg-neutral-600 transition z-0;
+        @apply w-40 cursor-pointer rounded-lg bg-neutral-800 py-1.5 pl-3 pr-10 text-left hover:bg-neutral-700 active:bg-neutral-600 transition z-0 disabled:text-neutral-500 disabled:hover:bg-neutral-800 disabled:active:bg-neutral-800 disabled:cursor-default;
     }
 
     .listbox-options {
@@ -39,7 +39,7 @@ body,
     }
 
     .input-text {
-        @apply appearance-none bg-neutral-800 rounded-lg px-3 py-1.5 max-w-[10rem] transition focus:outline-none hover:bg-neutral-700 active:bg-neutral-600;
+        @apply appearance-none bg-neutral-800 rounded-lg px-3 py-1.5 max-w-[10rem] transition focus:outline-none hover:bg-neutral-700 active:bg-neutral-600 disabled:text-neutral-500 disabled:hover:bg-neutral-800 disabled:active:bg-neutral-800;
 
         &::-webkit-scrollbar {
             @apply w-2;

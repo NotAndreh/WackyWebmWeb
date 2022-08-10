@@ -1,6 +1,6 @@
 <script lang="ts">
     import { faBookmark, faPause, faPlay, faXmark } from "@fortawesome/free-solid-svg-icons"
-    import { ease, instant, linear } from "../../lib/wackywebm/interpolation";
+    import { ease, easeIn, easeOut, instant, linear } from "../../lib/wackywebm/interpolation";
     import type { Keyframe } from "./types";
     import PropertyEditor from "./PropertyEditor.svelte"
     import ResizeBox from "./ResizeBox.svelte"
@@ -21,6 +21,8 @@
     let resBoxWidth: number
     let resBoxHeight: number
 
+    $: rw = video && clientWidth / video.videoWidth
+    $: rh = video && clientHeight / video.videoHeight
     $: formattedTime = formatTime(currentTime)
     $: formattedDuration = formatTime(duration)
     $: {
@@ -51,22 +53,30 @@
             keyframe = Math.abs(closest.time - currentTime) < 0.05 ? closest : null
             
             if (keyframe) {
-                resBoxWidth = clientWidth / video.videoWidth * keyframe.width
-                resBoxHeight = clientHeight / video.videoHeight * keyframe.height
+                resBoxWidth = keyframe.width
+                resBoxHeight = keyframe.height
             } else {
                 let t = (currentTime - leftKf.time) / (rightKf.time - leftKf.time)
                 switch (rightKf.interpolation) {
                     case 'linear':
-                        resBoxWidth = clientWidth / video.videoWidth * linear(leftKf.width, rightKf.width, t)
-                        resBoxHeight = clientHeight / video.videoHeight * linear(leftKf.height, rightKf.height, t)
+                        resBoxWidth = linear(leftKf.width, rightKf.width, t)
+                        resBoxHeight = linear(leftKf.height, rightKf.height, t)
                         break
                     case 'ease':
-                        resBoxWidth = clientWidth / video.videoWidth * ease(leftKf.width, rightKf.width, t)
-                        resBoxHeight = clientHeight / video.videoHeight * ease(leftKf.height, rightKf.height, t)
+                        resBoxWidth = ease(leftKf.width, rightKf.width, t)
+                        resBoxHeight = ease(leftKf.height, rightKf.height, t)
+                        break
+                    case 'ease-in':
+                        resBoxWidth = easeIn(leftKf.width, rightKf.width, t)
+                        resBoxHeight = easeIn(leftKf.height, rightKf.height, t)
+                        break
+                    case 'ease-out':
+                        resBoxWidth = easeOut(leftKf.width, rightKf.width, t)
+                        resBoxHeight = easeOut(leftKf.height, rightKf.height, t)
                         break
                     case 'instant':
-                        resBoxWidth = clientWidth / video.videoWidth * instant(leftKf.width, rightKf.width, t)
-                        resBoxHeight = clientHeight / video.videoHeight * instant(leftKf.height, rightKf.height, t)
+                        resBoxWidth = instant(leftKf.width, rightKf.width, t)
+                        resBoxHeight = instant(leftKf.height, rightKf.height, t)
                         break
                 }    
             }
@@ -144,8 +154,8 @@
                     keyframe.height = Math.floor(Math.min(video.videoHeight, Math.max(1, (video.videoHeight / clientHeight * h.detail))))
                 }}
                 active={keyframe !== null}
-                width={resBoxWidth}
-                height={resBoxHeight} />
+                width={rw * resBoxWidth}
+                height={rh * resBoxHeight} />
         </div>
     </div>
     
@@ -181,7 +191,20 @@
 
     <div class="h-16">
         {#if keyframe}
-            <PropertyEditor bind:keyframe on:change={sync} />
+            <PropertyEditor 
+                bind:time={keyframe.time} 
+                bind:width={keyframe.width} 
+                bind:height={keyframe.height} 
+                bind:interpolation={keyframe.interpolation} 
+                on:change={sync} />
+        {:else}
+            <PropertyEditor 
+                time={Math.floor(currentTime * 100) / 100} 
+                width={resBoxWidth} 
+                height={resBoxHeight} 
+                interpolation={rightKf ? rightKf.interpolation : ''} 
+                disabled={true} 
+                on:change={sync} />
         {/if}
     </div>
     

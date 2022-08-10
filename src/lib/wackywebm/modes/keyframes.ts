@@ -1,5 +1,5 @@
 import type { FrameBounds, FrameInfo, Mode, ModeOptions } from "./base"
-import { ease, instant, linear } from "../interpolation"
+import { ease, easeIn, easeOut, instant, linear } from "../interpolation"
 
 export class Keyframes implements Mode {
     name = "Keyframes"
@@ -41,6 +41,16 @@ export class Keyframes implements Mode {
                 return {
                     width: ease(this.keyFrames[this.lastKf].width, this.keyFrames[this.lastKf + 1].width, t),
                     height: ease(this.keyFrames[this.lastKf].height, this.keyFrames[this.lastKf + 1].height, t),
+                }
+            case 'ease-in':
+                return {
+                    width: easeIn(this.keyFrames[this.lastKf].width, this.keyFrames[this.lastKf + 1].width, t),
+                    height: easeIn(this.keyFrames[this.lastKf].height, this.keyFrames[this.lastKf + 1].height, t),
+                }
+            case 'ease-out':
+                return {
+                    width: easeOut(this.keyFrames[this.lastKf].width, this.keyFrames[this.lastKf + 1].width, t),
+                    height: easeOut(this.keyFrames[this.lastKf].height, this.keyFrames[this.lastKf + 1].height, t),
                 }
             case 'instant':
                 return {
