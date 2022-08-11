@@ -25,7 +25,6 @@
 
     $: rw = video && clientWidth / videoWidth
     $: rh = video && clientHeight / videoHeight
-    $: video && console.log(clientWidth, videoWidth)
     $: formattedTime = formatTime(currentTime)
     $: formattedDuration = formatTime(duration)
     $: {
