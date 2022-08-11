@@ -13,6 +13,8 @@
     let duration: number
     let clientWidth: number
     let clientHeight: number
+    let videoWidth: number
+    let videoHeight: number
     let currentTime: number = 0
     let keyframe: Keyframe | null
     let leftKf: Keyframe | null
@@ -21,8 +23,9 @@
     let resBoxWidth: number
     let resBoxHeight: number
 
-    $: rw = video && clientWidth / video.videoWidth
-    $: rh = video && clientHeight / video.videoHeight
+    $: rw = video && clientWidth / videoWidth
+    $: rh = video && clientHeight / videoHeight
+    $: video && console.log(clientWidth, videoWidth)
     $: formattedTime = formatTime(currentTime)
     $: formattedDuration = formatTime(duration)
     $: {
@@ -38,8 +41,8 @@
             }
             if (leftKf.time > currentTime) leftKf = {
                 time: 0,
-                width: video.videoWidth,
-                height: video.videoHeight,
+                width: videoWidth,
+                height: videoHeight,
                 interpolation: "linear"
             }
             if (rightKf.time < currentTime) rightKf = {
@@ -113,8 +116,8 @@
     function addKeyframe() {
         keyframes.push({
             time: Math.floor(currentTime * 100) / 100,
-            width: video.videoWidth,
-            height: video.videoHeight,
+            width: videoWidth,
+            height: videoHeight,
             interpolation: "linear"
         })
         keyframes.sort((a, b) => a.time - b.time)
@@ -143,15 +146,17 @@
                 bind:currentTime
                 bind:this={video}
                 bind:duration
+                bind:videoWidth
+                bind:videoHeight
                 src={preview} 
                 class="rounded-lg self-center w-full min-h-[20rem]" />
                 
             <ResizeBox
                 on:changewidth={(w) => {
-                    keyframe.width = Math.floor(Math.min(video.videoWidth, Math.max(1, (video.videoWidth / clientWidth * w.detail))))
+                    keyframe.width = Math.floor(Math.min(videoWidth, Math.max(1, (videoWidth / clientWidth * w.detail))))
                 }}
                 on:changeheight={(h) => {
-                    keyframe.height = Math.floor(Math.min(video.videoHeight, Math.max(1, (video.videoHeight / clientHeight * h.detail))))
+                    keyframe.height = Math.floor(Math.min(videoHeight, Math.max(1, (videoHeight / clientHeight * h.detail))))
                 }}
                 active={keyframe !== null}
                 width={rw * resBoxWidth}
