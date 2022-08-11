@@ -42,81 +42,23 @@
                     leaveTo="transform scale-90 opacity-0"
                 >
                     <ListboxOptions class="listbox-options">
-                        <ListboxOption 
-                            class={({ active }) => `listbox-option ${
-                                active ? 'bg-neutral-900' : 'text-white'
-                            }`}
-                            value="linear"
-                            let:selected>
-                            <span class="flex items-center justify-start gap-2">
-                                {#if selected}
-                                    <Fa class="h-4 w-4" icon={faCheck} />
-                                {:else}
-                                    <div class="h-4 w-4"></div>
-                                {/if}
-                                <span class={selected && "font-semibold"}>linear</span>
-                            </span>
-                        </ListboxOption>
-                        <ListboxOption 
-                            class={({ active }) => `listbox-option ${
-                                active ? 'bg-neutral-900' : 'text-white'
-                            }`}
-                            value="ease"
-                            let:selected>
-                            <span class="flex items-center justify-start gap-2">
-                                {#if selected}
-                                    <Fa class="h-4 w-4" icon={faCheck} />
-                                {:else}
-                                    <div class="h-4 w-4"></div>
-                                {/if}
-                                <span class={selected && "font-semibold"}>ease</span>
-                            </span>
-                        </ListboxOption>
-                        <ListboxOption 
-                            class={({ active }) => `listbox-option ${
-                                active ? 'bg-neutral-900' : 'text-white'
-                            }`}
-                            value="ease-in"
-                            let:selected>
-                            <span class="flex items-center justify-start gap-2">
-                                {#if selected}
-                                    <Fa class="h-4 w-4" icon={faCheck} />
-                                {:else}
-                                    <div class="h-4 w-4"></div>
-                                {/if}
-                                <span class={selected && "font-semibold"}>ease-in</span>
-                            </span>
-                        </ListboxOption>
-                        <ListboxOption 
-                            class={({ active }) => `listbox-option ${
-                                active ? 'bg-neutral-900' : 'text-white'
-                            }`}
-                            value="ease-out"
-                            let:selected>
-                            <span class="flex items-center justify-start gap-2">
-                                {#if selected}
-                                    <Fa class="h-4 w-4" icon={faCheck} />
-                                {:else}
-                                    <div class="h-4 w-4"></div>
-                                {/if}
-                                <span class={selected && "font-semibold"}>ease-out</span>
-                            </span>
-                        </ListboxOption>
-                        <ListboxOption 
-                            class={({ active }) => `listbox-option ${
-                                active ? 'bg-neutral-900' : 'text-white'
-                            }`}
-                            value="instant"
-                            let:selected>
-                            <span class="flex items-center justify-start gap-2">
-                                {#if selected}
-                                    <Fa class="h-4 w-4" icon={faCheck} />
-                                {:else}
-                                    <div class="h-4 w-4"></div>
-                                {/if}
-                                <span class={selected && "font-semibold"}>instant</span>
-                            </span>
-                        </ListboxOption>
+                        {#each ["linear", "ease", "ease-in", "ease-out", "instant"] as item}
+                            <ListboxOption 
+                                class={({ active }) => `listbox-option ${
+                                    active ? 'bg-neutral-900' : 'text-white'
+                                }`}
+                                value={item}
+                                let:selected>
+                                <span class="flex items-center justify-start gap-2">
+                                    {#if selected}
+                                        <Fa class="h-4 w-4" icon={faCheck} />
+                                    {:else}
+                                        <div class="h-4 w-4"></div>
+                                    {/if}
+                                    <span class={selected && "font-semibold"}>{item}</span>
+                                </span>
+                            </ListboxOption>
+                        {/each}
                     </ListboxOptions>
                 </Transition>
             </div>
