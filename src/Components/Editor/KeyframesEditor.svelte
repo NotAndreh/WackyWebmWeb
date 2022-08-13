@@ -82,7 +82,11 @@
                         break
                 }    
             }
-        } else keyframe = null
+        } else {
+            keyframe = null
+            resBoxWidth = videoWidth
+            resBoxHeight = videoHeight
+        }
     }
     
     let keyframes: Keyframe[] = []
@@ -141,9 +145,9 @@
         <div class="relative mx-auto" bind:clientWidth bind:clientHeight>
             <!-- svelte-ignore a11y-media-has-caption -->
             <video 
+                bind:this={video}
                 bind:paused 
                 bind:currentTime
-                bind:this={video}
                 bind:duration
                 bind:videoWidth
                 bind:videoHeight
@@ -206,7 +210,7 @@
                 time={Math.floor(currentTime * 100) / 100} 
                 width={resBoxWidth} 
                 height={resBoxHeight} 
-                interpolation={rightKf ? rightKf.interpolation : ''} 
+                interpolation={rightKf ? rightKf.interpolation : 'linear'} 
                 disabled={true} 
                 on:change={sync} />
         {/if}

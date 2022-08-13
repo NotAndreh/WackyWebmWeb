@@ -43,8 +43,7 @@
         new AudioBounce(),
         new AudioShutter()
     ]
-    let selectedMode: Mode = modes[5]
-    modes[5].options.content.value = "1,100,100,linear\n2,50,50,linear\n4,120,120,linear"
+    let selectedMode: Mode = modes[0]
 
     let scale = 4
     let split = 50
