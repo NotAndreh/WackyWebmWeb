@@ -1,4 +1,5 @@
 import type { FrameBounds, FrameInfo, Mode, ModeOptions } from "./base"
+import { ease, easeIn, easeOut, instant, linear } from "../interpolation"
 
 export class Keyframes implements Mode {
     name = "Keyframes"
@@ -30,11 +31,36 @@ export class Keyframes implements Mode {
             }
 
         const t = (info.frame - this.keyFrames[this.lastKf].time) / (this.keyFrames[this.lastKf + 1].time - this.keyFrames[this.lastKf].time)
-        switch (this.keyFrames[this.lastKf].interpolation.toLowerCase()) {
+        switch (this.keyFrames[this.lastKf+1].interpolation.toLowerCase()) {
             case 'linear':
                 return {
-                    width: lerp(this.keyFrames[this.lastKf].width, this.keyFrames[this.lastKf + 1].width, t),
-                    height: lerp(this.keyFrames[this.lastKf].height, this.keyFrames[this.lastKf + 1].height, t),
+                    width: linear(this.keyFrames[this.lastKf].width, this.keyFrames[this.lastKf + 1].width, t),
+                    height: linear(this.keyFrames[this.lastKf].height, this.keyFrames[this.lastKf + 1].height, t),
+                }
+            case 'ease':
+                return {
+                    width: ease(this.keyFrames[this.lastKf].width, this.keyFrames[this.lastKf + 1].width, t),
+                    height: ease(this.keyFrames[this.lastKf].height, this.keyFrames[this.lastKf + 1].height, t),
+                }
+            case 'ease-in':
+                return {
+                    width: easeIn(this.keyFrames[this.lastKf].width, this.keyFrames[this.lastKf + 1].width, t),
+                    height: easeIn(this.keyFrames[this.lastKf].height, this.keyFrames[this.lastKf + 1].height, t),
+                }
+            case 'ease-out':
+                return {
+                    width: easeOut(this.keyFrames[this.lastKf].width, this.keyFrames[this.lastKf + 1].width, t),
+                    height: easeOut(this.keyFrames[this.lastKf].height, this.keyFrames[this.lastKf + 1].height, t),
+                }
+            case 'instant':
+                return {
+                    width: instant(this.keyFrames[this.lastKf].width, this.keyFrames[this.lastKf + 1].width, t),
+                    height: instant(this.keyFrames[this.lastKf].height, this.keyFrames[this.lastKf + 1].height, t),
+                }
+            default:
+                return {
+                    width: linear(this.keyFrames[this.lastKf].width, this.keyFrames[this.lastKf + 1].width, t),
+                    height: linear(this.keyFrames[this.lastKf].height, this.keyFrames[this.lastKf + 1].height, t),
                 }
         }
     }
@@ -97,9 +123,9 @@ async function parseKeyFrames(content: string, framerate: number, originalWidth:
     const lines = content.split('\n').map(l => l.replace(/\s/g, '')).filter((s) => s !== '' && s[0] !== "#")
     let data: any = lines.map((l) => l.split(','))
     data = data.map((line) => {
-        let time = line[0].split(/[:.-]/)
+        let time = line[0].split(/[:-]/)
         // if there's only 1 "section" to the time, treat it as seconds. if there are 2, treat it as seconds:frames
-        let parsedTime = Math.floor(parseInt(time[0]) * framerate) + (time.length === 1 ? 0 : parseInt(time[1]))
+        let parsedTime = parseFloat(time[0]) * framerate + (time.length === 1 ? 0 : parseInt(time[1]))
 
         const width = infixToPostfix(line[1])
         const height = infixToPostfix(line[2])
@@ -144,12 +170,4 @@ async function parseKeyFrames(content: string, framerate: number, originalWidth:
     }
 
     return data
-}
-
-// various kinds of interpolation go here.
-function lerp(a: number, b: number, t: number) {
-    // convert the inputs to floats for accuracy, then convert the result back to an integer at the end
-    a = a + 0.0
-    b = b + 0.0
-    return Math.floor(a + t * (b - a))
 }

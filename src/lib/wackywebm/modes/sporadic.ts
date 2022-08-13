@@ -11,7 +11,7 @@ export class Sporadic implements Mode {
         }
     }
 
-    setup() { }
+    async setup() { }
 
     getFrameBounds(info: FrameInfo): FrameBounds {
         let startFrame = this.options.startFrame.value as number

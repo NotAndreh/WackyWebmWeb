@@ -12,7 +12,9 @@
     function handleDragEnter(e: DragEvent) {
         e.stopPropagation()
         e.preventDefault()
-        drag = true
+        if (e.dataTransfer.types.includes("Files")) {
+            drag = true
+        }
     }
 
     function handleDragLeave(e: DragEvent) {

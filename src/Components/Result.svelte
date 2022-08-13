@@ -10,7 +10,7 @@
     enterFrom="transform scale-90 opacity-0"
     enterTo="transform scale-100 opacity-100"
     as="section"
-    class="p-4 flex flex-col origin-top gap-2 max-w-[40rem] w-full self-center border border-neutral-800 rounded-xl shadow-lg"
+    class="p-4 mb-4 flex flex-col origin-top gap-2 max-w-[40rem] w-full self-center border border-neutral-800 rounded-xl shadow-lg"
 >
     <span class="font-semibold">Result:</span>
     <!-- svelte-ignore a11y-media-has-caption -->

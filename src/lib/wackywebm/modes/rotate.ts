@@ -9,7 +9,7 @@ export class Rotate implements Mode {
     orgWidth: number
     rotateAngle: number
 
-    setup(info: FrameInfo) {
+    async setup(info: FrameInfo) {
         this.orgHeight = info.maxHeight
         this.orgWidth = info.maxWidth
         this.rotateAngle = 0

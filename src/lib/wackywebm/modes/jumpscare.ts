@@ -20,7 +20,7 @@ export class Jumpscare implements Mode {
         }
     }
 
-    setup() { }
+    async setup() { }
 
     getFrameBounds(info: FrameInfo): FrameBounds {
         let minimumSizeFrame = this.options.minimumSizeFrame.value as number
